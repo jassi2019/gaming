@@ -55,31 +55,49 @@ void ASBGameFlowHUD::SetupSplashVideo()
 
     // Try to open the splash video from disk
     FString VideoPath = FPaths::ProjectContentDir() / TEXT("Splash/SplashVideo.mp4");
-    if (FPaths::FileExists(VideoPath))
+    FString AbsPath = FPaths::ConvertRelativePathToFull(VideoPath);
+
+    // Try multiple URL formats for maximum compatibility
+    TArray<FString> UrlsToTry = {
+        FString::Printf(TEXT("file://%s"), *AbsPath.Replace(TEXT("\\"), TEXT("/"))),
+        AbsPath,
+        VideoPath
+    };
+
+    for (const FString& Url : UrlsToTry)
     {
-        bSplashVideoPlaying = SplashMediaPlayer->OpenUrl(VideoPath);
-        UE_LOG(LogStormBreaker, Log, TEXT("Splash video: %s (opened: %s)"),
-            *VideoPath, bSplashVideoPlaying ? TEXT("yes") : TEXT("no"));
+        if (SplashMediaPlayer->OpenUrl(Url))
+        {
+            bSplashVideoPlaying = true;
+            UE_LOG(LogStormBreaker, Log, TEXT("Splash video opened: %s"), *Url);
+            break;
+        }
     }
-    else
+
+    if (!bSplashVideoPlaying)
     {
-        UE_LOG(LogStormBreaker, Warning, TEXT("Splash video not found: %s"), *VideoPath);
+        UE_LOG(LogStormBreaker, Warning, TEXT("Splash video failed to open. Tried: %s"), *AbsPath);
     }
 }
 
 void ASBGameFlowHUD::DrawSplashVideo()
 {
     if (!SplashMediaTexture || !SplashMediaPlayer) return;
-    if (!SplashMediaPlayer->IsPlaying() && ScreenTimer > 0.5f)
+
+    // Check if video finished
+    if (ScreenTimer > 1.0f && !SplashMediaPlayer->IsPlaying() && !SplashMediaPlayer->IsPreparing())
     {
         bSplashVideoPlaying = false;
         return;
     }
 
-    // Draw video texture to full screen via Canvas
-    Canvas->SetDrawColor(FColor::White);
-    Canvas->DrawTile(SplashMediaTexture, 0, 0, Canvas->SizeX, Canvas->SizeY,
-        0, 0, 1, 1);
+    // Draw video texture fullscreen
+    if (SplashMediaPlayer->IsPlaying() || SplashMediaPlayer->IsPreparing())
+    {
+        Canvas->SetDrawColor(FColor::White);
+        Canvas->DrawTile(SplashMediaTexture, 0, 0, Canvas->SizeX, Canvas->SizeY,
+            0.0f, 0.0f, 1.0f, 1.0f);
+    }
 }
 
 void ASBGameFlowHUD::BeginPlay()

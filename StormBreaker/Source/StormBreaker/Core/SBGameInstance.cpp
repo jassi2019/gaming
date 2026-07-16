@@ -7,6 +7,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
+#include "Online/OnlineSessionNames.h"
 
 USBGameInstance::USBGameInstance()
     : LocalPlayerDisplayName(TEXT("Player"))
@@ -92,7 +93,7 @@ void USBGameInstance::FindAndJoinSession()
     SessionSearch = MakeShareable(new FOnlineSessionSearch());
     SessionSearch->MaxSearchResults = 20;
     SessionSearch->bIsLanQuery = (OnlineSub->GetSubsystemName() == "NULL");
-    SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+    SessionSearch->QuerySettings.Set(FName(TEXT("PRESENCESEARCH")), true, EOnlineComparisonOp::Equals);
 
     SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(
         this, &USBGameInstance::OnFindSessionsComplete);

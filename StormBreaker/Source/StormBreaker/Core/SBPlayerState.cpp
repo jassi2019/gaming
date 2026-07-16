@@ -20,7 +20,7 @@ ASBPlayerState::ASBPlayerState()
     AttributeSet = CreateDefaultSubobject<USBAttributeSet>(TEXT("AttributeSet"));
 
     // Net update frequency for battle royale
-    NetUpdateFrequency = 20.0f;
+    SetNetUpdateFrequency(20.0f);
 }
 
 UAbilitySystemComponent* ASBPlayerState::GetAbilitySystemComponent() const

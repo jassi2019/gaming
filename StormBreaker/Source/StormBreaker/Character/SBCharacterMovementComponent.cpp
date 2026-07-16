@@ -27,7 +27,7 @@ USBCharacterMovementComponent::USBCharacterMovementComponent()
     MaxSwimSpeed = SwimSpeed;
     NavAgentProps.bCanCrouch = true;
     bCanWalkOffLedgesWhenCrouching = true;
-    CrouchedHalfHeight = 50.0f;
+    SetCrouchedHalfHeight(50.0f);
     AirControl = 0.35f;
     JumpZVelocity = 500.0f;
     BrakingDecelerationWalking = 1400.0f;
@@ -115,14 +115,14 @@ bool USBCharacterMovementComponent::CanAttemptJump() const
     return Super::CanAttemptJump();
 }
 
-bool USBCharacterMovementComponent::DoJump(bool bReplayingMoves)
+bool USBCharacterMovementComponent::DoJump(bool bReplayingMoves, float DeltaTime)
 {
     if (bIsProning)
     {
         StopProne();
         return false;
     }
-    return Super::DoJump(bReplayingMoves);
+    return Super::DoJump(bReplayingMoves, DeltaTime);
 }
 
 void USBCharacterMovementComponent::ProcessLanded(const FHitResult& Hit, float RemainingTime, int32 Iterations)

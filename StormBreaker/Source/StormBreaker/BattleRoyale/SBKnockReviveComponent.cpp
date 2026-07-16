@@ -295,7 +295,7 @@ void USBKnockReviveComponent::SpawnDeathCrate()
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-    TSubclassOf<ASBDeathCrate> CrateClass = DeathCrateClass ? DeathCrateClass : ASBDeathCrate::StaticClass();
+    TSubclassOf<ASBDeathCrate> CrateClass = DeathCrateClass.Get() ? DeathCrateClass : TSubclassOf<ASBDeathCrate>(ASBDeathCrate::StaticClass());
 
     ASBDeathCrate* Crate = GetWorld()->SpawnActor<ASBDeathCrate>(
         CrateClass, SpawnLoc, FRotator::ZeroRotator, SpawnParams);

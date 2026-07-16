@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Inventory/SBInventoryTypes.h"
+#include "Inventory/SBLootManager.h"
 #include "SBAirDrop.generated.h"
 
 class UBoxComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 
 UENUM(BlueprintType)
 enum class ESBAirDropState : uint8

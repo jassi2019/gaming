@@ -1,6 +1,7 @@
 // Copyright StormBreaker Games. All Rights Reserved.
 
 #include "Weapon/SBWeaponPickup.h"
+#include "Weapon/SBWeaponBase.h"
 #include "Weapon/SBWeaponComponent.h"
 #include "Weapon/SBWeaponDataAsset.h"
 #include "Character/SBCharacterBase.h"
@@ -29,7 +30,7 @@ ASBWeaponPickup::ASBWeaponPickup()
     BobTimer = 0.0f;
 
     // Net cull distance for performance
-    NetCullDistanceSquared = 5000.0f * 5000.0f;
+    SetNetCullDistanceSquared(5000.0f * 5000.0f);
 }
 
 void ASBWeaponPickup::InitPickup(USBWeaponDataAsset* InData, int32 InMagAmmo, int32 InReserveAmmo)

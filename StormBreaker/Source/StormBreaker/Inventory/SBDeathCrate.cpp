@@ -24,7 +24,7 @@ ASBDeathCrate::ASBDeathCrate()
     InteractionBox->SetBoxExtent(FVector(100.0f, 100.0f, 50.0f));
     InteractionBox->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
-    NetCullDistanceSquared = 10000.0f * 10000.0f;
+    SetNetCullDistanceSquared(10000.0f * 10000.0f);
 }
 
 void ASBDeathCrate::BeginPlay()

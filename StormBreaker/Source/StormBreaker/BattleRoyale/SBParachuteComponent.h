@@ -53,7 +53,7 @@ public:
     ESBParachuteState GetState() const { return ParachuteState; }
 
     UFUNCTION(BlueprintPure, Category = "StormBreaker|Parachute")
-    bool IsActive() const { return ParachuteState == ESBParachuteState::FreeFall || ParachuteState == ESBParachuteState::Deployed; }
+    bool IsParachuteActive() const { return ParachuteState == ESBParachuteState::FreeFall || ParachuteState == ESBParachuteState::Deployed; }
 
     UFUNCTION(BlueprintPure, Category = "StormBreaker|Parachute")
     float GetAltitudeAboveGround() const;

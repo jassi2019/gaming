@@ -89,8 +89,8 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
     CurrentFOV = DefaultFOV;
 
     // Replication
-    NetUpdateFrequency = 60.0f;
-    MinNetUpdateFrequency = 30.0f;
+    SetNetUpdateFrequency(60.0f);
+    SetMinNetUpdateFrequency(30.0f);
 }
 
 void ASBCharacterBase::BeginPlay()

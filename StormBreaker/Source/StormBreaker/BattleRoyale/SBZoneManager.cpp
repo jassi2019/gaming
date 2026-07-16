@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "Engine/DamageEvents.h"
 
 ASBZoneManager::ASBZoneManager()
 {

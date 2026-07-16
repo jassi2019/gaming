@@ -66,10 +66,10 @@ void ASBAirDrop::BeginDrop()
     DropState = ESBAirDropState::Dropping;
     SetActorTickEnabled(true);
 
-    if (SmokeTrailVFX)
+    if (SmokeTrailVFX.Get())
     {
         ActiveSmokeTrail = UNiagaraFunctionLibrary::SpawnSystemAttached(
-            SmokeTrailVFX, CrateMesh, NAME_None,
+            SmokeTrailVFX.Get(), CrateMesh.Get(), NAME_None,
             FVector::ZeroVector, FRotator::ZeroRotator,
             EAttachLocation::KeepRelativeOffset, true);
     }

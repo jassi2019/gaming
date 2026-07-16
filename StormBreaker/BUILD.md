@@ -9,9 +9,9 @@ Complete setup guide for building the StormBreaker Battle Royale project from a 
 | Software | Version | Purpose |
 |----------|---------|---------|
 | Unreal Engine | 5.8 | Game engine |
-| Visual Studio | 2022 (17.8+) | C++ compiler |
+| Visual Studio | 2022 (17.8+) or 2026 (18.x) | C++ compiler (MSVC v143+) |
 | Windows SDK | 10.0.22621.0+ | Platform SDK |
-| .NET SDK | 6.0+ | UnrealBuildTool |
+| .NET SDK | 6.0+ (UE 5.8 bundles .NET 10) | UnrealBuildTool |
 | Git | 2.40+ | Version control |
 | Android Studio | 2024.1+ | Android builds (optional) |
 | Android NDK | r25c+ | Android native compilation (optional) |
@@ -73,13 +73,15 @@ cd gaming/StormBreaker
 
 ### Option B: Via Command Line
 ```bash
-# From the StormBreaker directory
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\GenerateProjectFiles.bat" StormBreaker.uproject
+# Set UE_INSTALL_PATH to your Unreal Engine installation
+# Example: C:\Users\HP\Music\Own Game\UE_5.8
+# Or: C:\Program Files\Epic Games\UE_5.8
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\GenerateProjectFiles.bat" StormBreaker.uproject
 ```
 
 ### Option C: Via UnrealBuildTool
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe" -projectfiles -project="StormBreaker.uproject" -game -engine
+"<UE_INSTALL_PATH>\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe" -projectfiles -project="StormBreaker.uproject" -game -engine
 ```
 
 ## Build Configurations
@@ -91,27 +93,27 @@ cd gaming/StormBreaker
 # Platform: Win64
 
 # Or via command line:
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" StormBreakerEditor Win64 Development "StormBreaker.uproject"
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\Build.bat" StormBreakerEditor Win64 Development "StormBreaker.uproject"
 ```
 
 ### Development Game (testing)
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" StormBreaker Win64 Development "StormBreaker.uproject"
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\Build.bat" StormBreaker Win64 Development "StormBreaker.uproject"
 ```
 
 ### Development Server (dedicated server)
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" StormBreakerServer Win64 Development "StormBreaker.uproject"
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\Build.bat" StormBreakerServer Win64 Development "StormBreaker.uproject"
 ```
 
 ### Shipping (release)
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" StormBreaker Win64 Shipping "StormBreaker.uproject"
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\Build.bat" StormBreaker Win64 Shipping "StormBreaker.uproject"
 ```
 
 ### Android (mobile)
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" StormBreaker Android Development "StormBreaker.uproject"
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\Build.bat" StormBreaker Android Development "StormBreaker.uproject"
 ```
 
 ## Project Structure
@@ -233,15 +235,15 @@ Editor → Platforms → Windows → Package Project
 ```
 Or via command line:
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Win64 -configuration=Shipping -cook -stage -pak -package
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Win64 -configuration=Shipping -cook -stage -pak -package
 ```
 
 ### Android
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Android -configuration=Shipping -cook -stage -pak -package
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Android -configuration=Shipping -cook -stage -pak -package
 ```
 
 ### Dedicated Server
 ```bash
-"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Win64 -server -serverconfig=Shipping -cook -stage -pak -package
+"<UE_INSTALL_PATH>\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun -project="StormBreaker.uproject" -platform=Win64 -server -serverconfig=Shipping -cook -stage -pak -package
 ```

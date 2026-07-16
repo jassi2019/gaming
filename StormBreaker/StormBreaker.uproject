@@ -22,7 +22,7 @@
         },
         {
             "Name": "StormBreakerServer",
-            "Type": "Server",
+            "Type": "ServerOnly",
             "LoadingPhase": "Default"
         }
     ],
@@ -35,8 +35,7 @@
         { "Name": "Water", "Enabled": true },
         { "Name": "ChaosVehiclesPlugin", "Enabled": true },
         { "Name": "AudioModulation", "Enabled": true },
-        { "Name": "Metasound", "Enabled": true },
-        { "Name": "NavigationSystem", "Enabled": true }
+        { "Name": "Metasound", "Enabled": true }
     ],
     "TargetPlatforms": [
         "Android",

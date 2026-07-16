@@ -41,7 +41,7 @@ public:
     virtual void UpdateCharacterStateBeforeMovement(float DeltaSeconds) override;
     virtual void UpdateCharacterStateAfterMovement(float DeltaSeconds) override;
     virtual bool CanAttemptJump() const override;
-    virtual bool DoJump(bool bReplayingMoves) override;
+    virtual bool DoJump(bool bReplayingMoves, float DeltaTime) override;
     virtual void ProcessLanded(const FHitResult& Hit, float RemainingTime, int32 Iterations) override;
 
     // --- Network Prediction ---

@@ -7,6 +7,7 @@
 #include "Character/SBCharacterBase.h"
 #include "Weapon/SBWeaponComponent.h"
 #include "Weapon/SBWeaponDataAsset.h"
+#include "AI/SBBotSpawner.h"
 #include "UI/SBDebugHUD.h"
 #include "StormBreaker.h"
 #include "GameFramework/PlayerStart.h"
@@ -207,7 +208,18 @@ void ASBBattleRoyaleGameMode::Tick(float DeltaSeconds)
 void ASBBattleRoyaleGameMode::SpawnBots()
 {
     if (NumberOfBots <= 0) return;
-    UE_LOG(LogSBAI, Log, TEXT("Spawning %d bots."), NumberOfBots);
+
+    USBBotSpawner* BotSpawner = GetWorld()->GetSubsystem<USBBotSpawner>();
+    if (BotSpawner)
+    {
+        BotSpawner->SpawnBots(NumberOfBots, TSubclassOf<ASBCharacterBase>(DefaultPawnClass));
+        AlivePlayerCount += BotSpawner->GetAliveBotCount();
+
+        ASBBattleRoyaleGameState* GS = GetGameState<ASBBattleRoyaleGameState>();
+        if (GS) GS->SetAlivePlayerCount(AlivePlayerCount);
+    }
+
+    UE_LOG(LogSBAI, Log, TEXT("Spawned %d bots. Total alive: %d"), NumberOfBots, AlivePlayerCount);
 }
 
 void ASBBattleRoyaleGameMode::CheckWinCondition()

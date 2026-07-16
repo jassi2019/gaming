@@ -15,6 +15,8 @@
 #include "Weapon/SBWeaponTypes.h"
 #include "Inventory/SBInventoryComponent.h"
 #include "BattleRoyale/SBKnockReviveComponent.h"
+#include "BattleRoyale/SBParachuteComponent.h"
+#include "BattleRoyale/SBMinimapDataComponent.h"
 #include "Core/SBPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -75,6 +77,12 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
 
     // Knock/Revive component
     KnockReviveComponent = CreateDefaultSubobject<USBKnockReviveComponent>(TEXT("KnockReviveComponent"));
+
+    // Parachute component
+    ParachuteComponent = CreateDefaultSubobject<USBParachuteComponent>(TEXT("ParachuteComponent"));
+
+    // Minimap data component
+    MinimapDataComponent = CreateDefaultSubobject<USBMinimapDataComponent>(TEXT("MinimapDataComponent"));
 
     // Initialize camera state
     CurrentBoomLength = DefaultBoomLength;

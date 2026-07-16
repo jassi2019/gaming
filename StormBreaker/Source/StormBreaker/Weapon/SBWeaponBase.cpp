@@ -92,7 +92,7 @@ void ASBWeaponBase::InitializeWeapon(USBWeaponDataAsset* InData)
 
     if (WeaponData->WeaponMesh)
     {
-        WeaponMeshComp->SetSkeletalMesh(WeaponData->WeaponMesh);
+        WeaponMeshComp->SetSkeletalMeshAsset(WeaponData->WeaponMesh);
     }
 
     CurrentFireMode = WeaponData->DefaultFireMode;

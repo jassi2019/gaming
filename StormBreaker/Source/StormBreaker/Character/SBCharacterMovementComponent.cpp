@@ -27,7 +27,7 @@ USBCharacterMovementComponent::USBCharacterMovementComponent()
     MaxSwimSpeed = SwimSpeed;
     NavAgentProps.bCanCrouch = true;
     bCanWalkOffLedgesWhenCrouching = true;
-    SetCrouchedHalfHeight(50.0f);
+    CrouchedHalfHeight = 50.0f;
     AirControl = 0.35f;
     JumpZVelocity = 500.0f;
     BrakingDecelerationWalking = 1400.0f;

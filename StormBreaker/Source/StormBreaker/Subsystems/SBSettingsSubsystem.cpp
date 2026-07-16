@@ -42,7 +42,7 @@ void USBSettingsSubsystem::ApplyGraphicsSettings()
 
     UserSettings->SetOverallScalabilityLevel(Graphics.QualityPreset);
     UserSettings->SetFrameRateLimit(static_cast<float>(Graphics.FrameRateLimit));
-    UserSettings->SetResolutionScaleValueEx(Graphics.RenderScale);
+    UserSettings->SetResolutionScaleNormalized(Graphics.RenderScale / 100.0f);
 
     if (!Graphics.bEnableShadows)
     {

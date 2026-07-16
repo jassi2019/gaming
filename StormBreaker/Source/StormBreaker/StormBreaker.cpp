@@ -20,7 +20,7 @@ namespace SBTags
 {
     static FGameplayTag FindOrAdd(const FName& TagName)
     {
-        return UGameplayTagsManager::Get().AddNativeGameplayTag(TagName);
+        return UGameplayTagsManager::Get().AddNativeGameplayTag(TagName, TEXT(""));
     }
 
     const FGameplayTag& State_Dead()

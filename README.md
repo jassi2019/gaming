@@ -27,7 +27,7 @@ Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyr
 | 2 | Third Person Character | ✅ Complete |
 | 3 | Weapon System | ✅ Complete |
 | 4 | Inventory & Loot & BR Core | ✅ Complete |
-| 5 | Battle Royale Mechanics | ⬜ Pending |
+| 5 | Battle Royale Match Flow | ✅ Complete |
 | 6 | Multiplayer | ⬜ Pending |
 | 7 | AI Bots | ⬜ Pending |
 | 8 | UI | ⬜ Pending |
@@ -122,7 +122,8 @@ StormBreaker/
 │   ├── 04_BlueprintSetup.md
 │   ├── 05_Phase2_CharacterSetup.md
 │   ├── 06_Phase3_WeaponSystem.md
-│   └── 07_Phase4_InventoryLoot.md
+│   ├── 07_Phase4_InventoryLoot.md
+│   └── 08_Phase5_MatchFlow.md
 ├── Plugins/
 ├── Tests/
 ├── .gitignore
@@ -235,6 +236,23 @@ Server: validate fire rate + ammo (anti-cheat)
 - **Boost:** 0-100 scale, decays 3/s, tiers at 20/40/60 give 2/4/6 HP regen/s, 60+ gives 6.5% speed bonus
 - **Knock/Revive:** Team-mode aware, solo = instant death, knocked players crawl at 50cm/s
 
-## Next: Phase 5 — Battle Royale Mechanics
+## Phase 5 — Battle Royale Match Flow (Complete)
 
-Will include: Plane spawn, jump, parachute, safe zone, blue zone damage, random loot spawns, air drops, vehicles.
+### New Classes
+
+| Class | Purpose |
+|-------|---------|
+| `ASBAircraftSystem` | Random flight path generation, player jump/eject, replicated path |
+| `USBParachuteComponent` | FreeFall (5000cm/s) → Deploy (800cm/s descent) → Landing, auto-deploy at 500m, wind, steering |
+| `ASBZoneManager` | 8-phase PUBG-style zone with wait/shrink/damage, ease-in-out interpolation, random center shift |
+| `ASBAirDrop` | Cargo crate falling from 15000cm, smoke trail, high-tier loot, lootable after landing |
+| `USBMinimapDataComponent` | Collects markers (player, team, zone, aircraft, drops, crates, ping) + compass heading |
+
+### Zone Phases (8 total)
+Phase 1-3: 0.4-1.0 DPS, 300-150s wait, 50% radius reduction each
+Phase 4-6: 2.0-5.0 DPS, 120-60s wait, increasing intensity
+Phase 7-8: 8.0-14.0 DPS, 30s wait, final collapse to 0
+
+## Next: Phase 6 — Multiplayer & Networking
+
+Will include: Dedicated server, lobby, matchmaking, voice chat ready, team mode, spectator mode.

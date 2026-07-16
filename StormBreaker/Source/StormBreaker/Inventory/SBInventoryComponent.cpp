@@ -6,6 +6,7 @@
 #include "Engine/DataTable.h"
 #include "Net/UnrealNetwork.h"
 #include "Character/SBCharacterBase.h"
+#include "Character/SBCharacterMovementComponent.h"
 #include "Core/SBAttributeSet.h"
 #include "AbilitySystemComponent.h"
 

@@ -9,6 +9,8 @@
 #include "Weapon/SBWeaponDataAsset.h"
 #include "AI/SBBotSpawner.h"
 #include "BattleRoyale/SBMapConfigurator.h"
+#include "BattleRoyale/SBWorldGenerator.h"
+#include "BattleRoyale/SBEnvironmentManager.h"
 #include "BattleRoyale/SBZoneManager.h"
 #include "Backend/SBBackendSubsystem.h"
 #include "Backend/SBBackendTypes.h"
@@ -96,10 +98,16 @@ void ASBBattleRoyaleGameMode::SpawnArena()
     {
         FActorSpawnParameters Params;
         Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-        GetWorld()->SpawnActor<ASBMapConfigurator>(ASBMapConfigurator::StaticClass(),
+
+        // Spawn full world generator (4x4km island with POIs, buildings, terrain, loot)
+        GetWorld()->SpawnActor<ASBWorldGenerator>(ASBWorldGenerator::StaticClass(),
             FVector::ZeroVector, FRotator::ZeroRotator, Params);
 
-        UE_LOG(LogSBBattleRoyale, Log, TEXT("Auto-spawned MapConfigurator (no PlayerStarts found)."));
+        // Spawn environment manager (day/night + weather)
+        GetWorld()->SpawnActor<ASBEnvironmentManager>(ASBEnvironmentManager::StaticClass(),
+            FVector::ZeroVector, FRotator::ZeroRotator, Params);
+
+        UE_LOG(LogSBBattleRoyale, Log, TEXT("Auto-spawned WorldGenerator + EnvironmentManager."));
     }
 }
 

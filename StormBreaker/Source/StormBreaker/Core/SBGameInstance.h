@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "SBGameInstance.generated.h"
-
-class USBSettingsSubsystem;
 
 /**
  * Root game instance — persists across map travel.

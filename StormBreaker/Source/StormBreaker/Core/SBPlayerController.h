@@ -7,10 +7,10 @@
 #include "SBPlayerController.generated.h"
 
 class UInputMappingContext;
-class UInputAction;
+class USBMobileTouchWidget;
 
 /**
- * Player controller — owns input mapping, HUD, and client-side RPC bridge.
+ * Player controller — owns input mapping, HUD, mobile touch widget, and client-side RPC bridge.
  * Enhanced Input System is bound here.
  */
 UCLASS()
@@ -33,6 +33,14 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
     int32 DefaultMappingPriority = 0;
+
+    // ----- Mobile -----
+
+    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Mobile")
+    TSubclassOf<USBMobileTouchWidget> MobileTouchWidgetClass;
+
+    UFUNCTION(BlueprintPure, Category = "StormBreaker|Mobile")
+    USBMobileTouchWidget* GetMobileTouchWidget() const { return MobileTouchWidget; }
 
     // ----- HUD -----
 
@@ -65,4 +73,8 @@ protected:
 
 private:
     void BindInputMappingContext();
+    void CreateMobileTouchWidget();
+
+    UPROPERTY()
+    TObjectPtr<USBMobileTouchWidget> MobileTouchWidget;
 };

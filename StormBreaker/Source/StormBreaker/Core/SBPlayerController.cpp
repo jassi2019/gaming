@@ -2,6 +2,7 @@
 
 #include "Core/SBPlayerController.h"
 #include "StormBreaker.h"
+#include "UI/SBMobileTouchWidget.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -14,6 +15,7 @@ void ASBPlayerController::BeginPlay()
 {
     Super::BeginPlay();
     BindInputMappingContext();
+    CreateMobileTouchWidget();
 }
 
 void ASBPlayerController::OnPossess(APawn* InPawn)
@@ -31,7 +33,6 @@ void ASBPlayerController::OnUnPossess()
 void ASBPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
-    // Input actions will be bound in Phase 2 (Character module)
 }
 
 void ASBPlayerController::BindInputMappingContext()
@@ -48,11 +49,34 @@ void ASBPlayerController::BindInputMappingContext()
     }
 }
 
+void ASBPlayerController::CreateMobileTouchWidget()
+{
+    if (!IsLocalController()) return;
+
+    // Only create on mobile platforms
+    bool bIsMobile = false;
+#if PLATFORM_ANDROID || PLATFORM_IOS
+    bIsMobile = true;
+#endif
+
+    if (!bIsMobile || !MobileTouchWidgetClass)
+    {
+        return;
+    }
+
+    MobileTouchWidget = CreateWidget<USBMobileTouchWidget>(this, MobileTouchWidgetClass);
+    if (MobileTouchWidget)
+    {
+        MobileTouchWidget->AddToViewport(100);
+        UE_LOG(LogStormBreaker, Log, TEXT("Mobile touch widget created."));
+    }
+}
+
 // ----- HUD -----
 
 void ASBPlayerController::ShowMatchHUD()
 {
-    // Widget creation handled by Blueprint subclass (BP_SBPlayerController)
+    // Widget creation handled by Blueprint subclass
 }
 
 void ASBPlayerController::ShowInventoryUI()
@@ -82,7 +106,6 @@ void ASBPlayerController::StartSpectating()
 
 void ASBPlayerController::Server_RequestRespawn_Implementation()
 {
-    // Only valid during warm-up or team revive
     UE_LOG(LogSBCharacter, Log, TEXT("Respawn requested by: %s"), *GetNameSafe(this));
 }
 
@@ -91,7 +114,6 @@ void ASBPlayerController::Server_RequestRespawn_Implementation()
 void ASBPlayerController::Client_OnMatchEnd_Implementation(bool bIsWinner)
 {
     UE_LOG(LogSBBattleRoyale, Log, TEXT("Match ended. Winner: %s"), bIsWinner ? TEXT("YES") : TEXT("NO"));
-    // Trigger end-game UI via Blueprint
 }
 
 void ASBPlayerController::Client_ShowKillFeed_Implementation(
@@ -99,5 +121,4 @@ void ASBPlayerController::Client_ShowKillFeed_Implementation(
 {
     UE_LOG(LogSBBattleRoyale, Log, TEXT("Kill Feed: %s eliminated %s with %s"),
         *KillerName, *VictimName, *WeaponName);
-    // Push to HUD widget via Blueprint
 }

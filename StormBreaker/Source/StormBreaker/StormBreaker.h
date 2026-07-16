@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogStormBreaker, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSBWeapon, Log, All);

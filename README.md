@@ -1,6 +1,6 @@
 # StormBreaker — Battle Royale Game
 
-A complete Battle Royale mobile game built with **Unreal Engine 5.6**, targeting **Android** and **Windows**.
+A complete Battle Royale mobile game built with **Unreal Engine 5.8**, targeting **Android** and **Windows**.
 
 Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyrighted content.
 
@@ -10,7 +10,7 @@ Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyr
 
 | Technology | Usage |
 |-----------|-------|
-| Unreal Engine 5.6 | Game engine |
+| Unreal Engine 5.8 | Game engine |
 | C++ | Core gameplay systems |
 | Blueprints | Visual scripting layer |
 | Enhanced Input System | Input handling (mobile + KB/M) |
@@ -24,7 +24,7 @@ Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyr
 | Phase | Module | Status |
 |-------|--------|--------|
 | 1 | Project Architecture | ✅ Complete |
-| 2 | Third Person Character | ⬜ Pending |
+| 2 | Third Person Character | ✅ Complete |
 | 3 | Weapon System | ⬜ Pending |
 | 4 | Inventory System | ⬜ Pending |
 | 5 | Battle Royale Mechanics | ⬜ Pending |
@@ -119,7 +119,8 @@ StormBreaker/
 │   ├── 01_CodingStandards.md
 │   ├── 02_MultiplayerArchitecture.md
 │   ├── 03_AssetPipeline.md
-│   └── 04_BlueprintSetup.md
+│   ├── 04_BlueprintSetup.md
+│   └── 05_Phase2_CharacterSetup.md
 ├── Plugins/
 ├── Tests/
 ├── .gitignore
@@ -138,13 +139,46 @@ StormBreaker/
 
 ## How to Build
 
-1. Install Unreal Engine 5.6 via Epic Games Launcher
+1. Install Unreal Engine 5.8 via Epic Games Launcher
 2. Clone this repository
 3. Open `StormBreaker/StormBreaker.uproject`
 4. Follow [Blueprint Setup Instructions](StormBreaker/Docs/04_BlueprintSetup.md)
 5. Build and run
 
-## Next: Phase 2 — Third Person Character
+## Phase 2 — Third Person Character (Complete)
 
-Will include: Walk, Run, Sprint, Jump, Crouch, Prone, Vault, Mantle, Swimming, Climbing, Camera System with full C++ classes, Animation Blueprint, and input bindings.
+### New C++ Classes
+
+| Class | Purpose |
+|-------|---------|
+| `USBCharacterMovementComponent` | Custom CMC — Sprint (800), Prone (100), Vault (0.4s arc), Mantle (0.8s climb), ADS speed, full network prediction via FSBSavedMove |
+| `ASBCharacterBase` | Main character — Enhanced Input bindings, third-person camera with smooth ADS transition, all movement states, GAS integration |
+| `USBCharacterAnimInstance` | Animation driver — speed, direction, aim offset (pitch/yaw), lean, foot IK, state flags for all movement modes |
+| `USBMobileTouchWidget` | Mobile touch — virtual joystick, look zone, action button delegates for Fire/ADS/Reload/Interact |
+
+### Movement Specs
+
+| Action | Speed (cm/s) | Key | Network |
+|--------|-------------|-----|---------|
+| Walk | 250 | WASD (slow stick) | CMC built-in |
+| Run | 500 | WASD | CMC built-in |
+| Sprint | 800 | Left Shift (hold) | FLAG_Custom_0 |
+| Jump | 500 Z vel | Space | CMC built-in |
+| Crouch | 200 | C (toggle) | CMC built-in |
+| Prone | 100 | Z (toggle) | FLAG_Custom_1 |
+| Vault | N/A | Space (auto) | Server authority |
+| Mantle | N/A | Space (auto) | Server authority |
+| Swim | 300 | Auto in water | MOVE_Swimming |
+| ADS | 200 | Right Mouse (hold) | FLAG_Custom_2 + COND_SkipOwner |
+
+### Camera System
+- Third-person spring arm with collision detection
+- Default: 300 cm boom, 90 FOV, right shoulder offset
+- ADS: 100 cm boom, 65 FOV, tighter shoulder offset
+- Smooth interpolation at 12 units/sec
+- Camera lag (15 speed) + rotation lag (20 speed)
+
+## Next: Phase 3 — Weapon System
+
+Will include: Assault Rifle, Sniper, SMG, Shotgun, Pistol, Grenade, Melee with ADS, Recoil, Reload, Bullet Drop, Muzzle Flash, Hit Effects, Ammo, Weapon Pickup, Weapon Swap, Inventory.
 

@@ -7,9 +7,7 @@ public class StormBreaker : ModuleRules
     public StormBreaker(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        // Strict includes — no monolithic headers
-        bEnforceIWYU = true;
+        IWYUSupport = IWYUSupport.Full;
 
         PublicDependencyModuleNames.AddRange(new string[]
         {
@@ -30,34 +28,16 @@ public class StormBreaker : ModuleRules
             "NavigationSystem",
             "AIModule",
             "OnlineSubsystem",
-            "OnlineSubsystemEOS",
             "OnlineSubsystemUtils",
             "NetCore"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
+            "OnlineSubsystemEOS",
             "Http",
             "Json",
-            "JsonUtilities",
-            "AudioModulation",
-            "MetasoundEngine"
-        });
-
-        // GAS setup
-        PublicIncludePaths.AddRange(new string[]
-        {
-            "StormBreaker/Core",
-            "StormBreaker/Character",
-            "StormBreaker/Weapon",
-            "StormBreaker/Inventory",
-            "StormBreaker/BattleRoyale",
-            "StormBreaker/Multiplayer",
-            "StormBreaker/AI",
-            "StormBreaker/UI",
-            "StormBreaker/Vehicle",
-            "StormBreaker/Backend",
-            "StormBreaker/Subsystems"
+            "JsonUtilities"
         });
     }
 }

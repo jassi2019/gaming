@@ -8,7 +8,7 @@
 #include "Weapon/SBWeaponComponent.h"
 #include "Weapon/SBWeaponDataAsset.h"
 #include "AI/SBBotSpawner.h"
-#include "UI/SBDebugHUD.h"
+#include "UI/SBInGameHUD.h"
 #include "StormBreaker.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,7 +26,7 @@ ASBBattleRoyaleGameMode::ASBBattleRoyaleGameMode()
     GameStateClass = ASBBattleRoyaleGameState::StaticClass();
     PlayerStateClass = ASBPlayerState::StaticClass();
     PlayerControllerClass = ASBPlayerController::StaticClass();
-    HUDClass = ASBHUD::StaticClass();
+    HUDClass = ASBInGameHUD::StaticClass();
 
     // PIE-friendly: start match with 1 player
     MinPlayersToStart = 1;

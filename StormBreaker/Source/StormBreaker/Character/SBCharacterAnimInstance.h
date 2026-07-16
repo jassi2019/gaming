@@ -83,6 +83,20 @@ public:
     UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
     float LeanAmount;
 
+    // --- Weapon ---
+
+    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    uint8 bHasWeapon : 1;
+
+    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    uint8 bIsFiring : 1;
+
+    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    uint8 bIsReloading : 1;
+
+    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    uint8 bIsEquipping : 1;
+
     // --- Foot IK ---
 
     UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
@@ -106,6 +120,7 @@ private:
     void UpdateAimOffset();
     void UpdateLean(float DeltaSeconds);
     void UpdateFootIK();
+    void UpdateWeaponState();
 
     FRotator PreviousRotation;
     float PreviousLean;

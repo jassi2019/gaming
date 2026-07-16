@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "AbilitySystemComponent.h"
+#include "Weapon/SBWeaponComponent.h"
+#include "Weapon/SBWeaponTypes.h"
 #include "Core/SBPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -62,6 +64,9 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
         SBMovementComponent->bOrientRotationToMovement = true;
         SBMovementComponent->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     }
+
+    // Weapon component
+    WeaponComponent = CreateDefaultSubobject<USBWeaponComponent>(TEXT("WeaponComponent"));
 
     // Initialize camera state
     CurrentBoomLength = DefaultBoomLength;
@@ -224,6 +229,33 @@ void ASBCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     {
         EIC->BindAction(IA_Interact, ETriggerEvent::Started, this, &ASBCharacterBase::Input_Interact);
     }
+
+    // Fire
+    if (IA_Fire)
+    {
+        EIC->BindAction(IA_Fire, ETriggerEvent::Started, this, &ASBCharacterBase::Input_FireStart);
+        EIC->BindAction(IA_Fire, ETriggerEvent::Completed, this, &ASBCharacterBase::Input_FireStop);
+    }
+
+    // Reload
+    if (IA_Reload)
+    {
+        EIC->BindAction(IA_Reload, ETriggerEvent::Started, this, &ASBCharacterBase::Input_Reload);
+    }
+
+    // Weapon slots
+    if (IA_WeaponSlot1)
+    {
+        EIC->BindAction(IA_WeaponSlot1, ETriggerEvent::Started, this, &ASBCharacterBase::Input_WeaponSlot1);
+    }
+    if (IA_WeaponSlot2)
+    {
+        EIC->BindAction(IA_WeaponSlot2, ETriggerEvent::Started, this, &ASBCharacterBase::Input_WeaponSlot2);
+    }
+    if (IA_WeaponSlot3)
+    {
+        EIC->BindAction(IA_WeaponSlot3, ETriggerEvent::Started, this, &ASBCharacterBase::Input_WeaponSlot3);
+    }
 }
 
 // --- Input Handlers ---
@@ -343,6 +375,54 @@ void ASBCharacterBase::Input_Interact(const FInputActionValue& Value)
 
     // Interaction with world objects will be handled in Phase 4 (Inventory)
     UE_LOG(LogSBCharacter, Verbose, TEXT("Interact pressed."));
+}
+
+void ASBCharacterBase::Input_FireStart(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->StartFire();
+    }
+}
+
+void ASBCharacterBase::Input_FireStop(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->StopFire();
+    }
+}
+
+void ASBCharacterBase::Input_Reload(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->Reload();
+    }
+}
+
+void ASBCharacterBase::Input_WeaponSlot1(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->SwitchToSlot(ESBWeaponSlot::Primary);
+    }
+}
+
+void ASBCharacterBase::Input_WeaponSlot2(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->SwitchToSlot(ESBWeaponSlot::Secondary);
+    }
+}
+
+void ASBCharacterBase::Input_WeaponSlot3(const FInputActionValue& Value)
+{
+    if (WeaponComponent)
+    {
+        WeaponComponent->SwitchToSlot(ESBWeaponSlot::Sidearm);
+    }
 }
 
 // --- Stance ---

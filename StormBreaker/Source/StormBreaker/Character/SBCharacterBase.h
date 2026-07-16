@@ -9,6 +9,7 @@
 #include "SBCharacterBase.generated.h"
 
 class USBCharacterMovementComponent;
+class USBWeaponComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -93,6 +94,26 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
     TObjectPtr<UInputAction> IA_Interact;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    TObjectPtr<UInputAction> IA_Fire;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    TObjectPtr<UInputAction> IA_Reload;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    TObjectPtr<UInputAction> IA_WeaponSlot1;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    TObjectPtr<UInputAction> IA_WeaponSlot2;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    TObjectPtr<UInputAction> IA_WeaponSlot3;
+
+    // --- Weapon ---
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    TObjectPtr<USBWeaponComponent> WeaponComponent;
+
     // --- Stance ---
 
     UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
@@ -142,6 +163,12 @@ protected:
     void Input_ADSStart(const FInputActionValue& Value);
     void Input_ADSStop(const FInputActionValue& Value);
     void Input_Interact(const FInputActionValue& Value);
+    void Input_FireStart(const FInputActionValue& Value);
+    void Input_FireStop(const FInputActionValue& Value);
+    void Input_Reload(const FInputActionValue& Value);
+    void Input_WeaponSlot1(const FInputActionValue& Value);
+    void Input_WeaponSlot2(const FInputActionValue& Value);
+    void Input_WeaponSlot3(const FInputActionValue& Value);
 
     // --- Camera ---
     void UpdateCameraADS(float DeltaTime);

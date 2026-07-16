@@ -5,6 +5,8 @@
 #include "Character/SBCharacterMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Weapon/SBWeaponComponent.h"
+#include "Weapon/SBWeaponBase.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CollisionQueryParams.h"
 
@@ -36,6 +38,10 @@ void USBCharacterAnimInstance::NativeInitializeAnimation()
     bIsVaulting = false;
     bIsSwimming = false;
     bIsOnGround = true;
+    bHasWeapon = false;
+    bIsFiring = false;
+    bIsReloading = false;
+    bIsEquipping = false;
     Speed = 0.0f;
     Direction = 0.0f;
     LeanAmount = 0.0f;
@@ -65,6 +71,7 @@ void USBCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     UpdateAimOffset();
     UpdateLean(DeltaSeconds);
     UpdateFootIK();
+    UpdateWeaponState();
 }
 
 void USBCharacterAnimInstance::UpdateLocomotion(float DeltaSeconds)
@@ -178,4 +185,36 @@ void USBCharacterAnimInstance::UpdateFootIK()
     HipOffset = FMath::Min(LeftFootIKOffset, RightFootIKOffset);
     LeftFootIKOffset -= HipOffset;
     RightFootIKOffset -= HipOffset;
+}
+
+void USBCharacterAnimInstance::UpdateWeaponState()
+{
+    if (!OwnerCharacter.IsValid()) return;
+
+    USBWeaponComponent* WeaponComp = OwnerCharacter->FindComponentByClass<USBWeaponComponent>();
+    if (!WeaponComp)
+    {
+        bHasWeapon = false;
+        bIsFiring = false;
+        bIsReloading = false;
+        bIsEquipping = false;
+        return;
+    }
+
+    ASBWeaponBase* Weapon = WeaponComp->GetActiveWeapon();
+    bHasWeapon = (Weapon != nullptr);
+
+    if (Weapon)
+    {
+        ESBWeaponState State = Weapon->GetWeaponState();
+        bIsFiring = (State == ESBWeaponState::Firing);
+        bIsReloading = (State == ESBWeaponState::Reloading);
+        bIsEquipping = (State == ESBWeaponState::Equipping);
+    }
+    else
+    {
+        bIsFiring = false;
+        bIsReloading = false;
+        bIsEquipping = false;
+    }
 }

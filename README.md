@@ -25,7 +25,7 @@ Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyr
 |-------|--------|--------|
 | 1 | Project Architecture | ✅ Complete |
 | 2 | Third Person Character | ✅ Complete |
-| 3 | Weapon System | ⬜ Pending |
+| 3 | Weapon System | ✅ Complete |
 | 4 | Inventory System | ⬜ Pending |
 | 5 | Battle Royale Mechanics | ⬜ Pending |
 | 6 | Multiplayer | ⬜ Pending |
@@ -120,7 +120,8 @@ StormBreaker/
 │   ├── 02_MultiplayerArchitecture.md
 │   ├── 03_AssetPipeline.md
 │   ├── 04_BlueprintSetup.md
-│   └── 05_Phase2_CharacterSetup.md
+│   ├── 05_Phase2_CharacterSetup.md
+│   └── 06_Phase3_WeaponSystem.md
 ├── Plugins/
 ├── Tests/
 ├── .gitignore
@@ -178,7 +179,43 @@ StormBreaker/
 - Smooth interpolation at 12 units/sec
 - Camera lag (15 speed) + rotation lag (20 speed)
 
-## Next: Phase 3 — Weapon System
+## Phase 3 — Weapon & Combat System (Complete)
 
-Will include: Assault Rifle, Sniper, SMG, Shotgun, Pistol, Grenade, Melee with ADS, Recoil, Reload, Bullet Drop, Muzzle Flash, Hit Effects, Ammo, Weapon Pickup, Weapon Swap, Inventory.
+### New C++ Classes
+
+| Class | Lines | Purpose |
+|-------|-------|---------|
+| `SBWeaponTypes.h` | 250 | All enums (WeaponType, FireMode, DamageType, Slot, AmmoType, Surface), structs (RecoilData, SpreadData, DamageData, ProjectileData, AttachmentModifier, HitResult, FireEvent) |
+| `USBWeaponDataAsset` | 220 | Data asset defining all weapon properties — no subclassing needed, fully data-driven |
+| `ASBWeaponBase` | 650 | Weapon actor: fire (hitscan with penetration + projectile), recoil patterns, spread, damage falloff, headshot/limb multipliers, reload, equip/unequip, fire modes (Single/Burst/Auto), attachments, aim assist |
+| `USBWeaponComponent` | 280 | Inventory manager: 5 slots (Primary/Secondary/Sidearm/Melee/Throwable), weapon switching, drop/pickup, ammo pool, action forwarding |
+| `ASBProjectileBase` | 130 | Projectile: sphere collision, gravity, direct + radial damage, trail/impact VFX |
+| `ASBWeaponPickup` | 100 | World pickup: interaction sphere, stored ammo, bob animation, replicated |
+
+### Combat Pipeline
+```
+Client: press Fire → local effects (muzzle flash, recoil, sound)
+                    → Server_Fire RPC
+Server: validate fire rate + ammo (anti-cheat)
+       → consume ammo
+       → hitscan trace with penetration OR spawn projectile
+       → apply damage (shield → health via GAS)
+       → Multicast_PlayFireEffects to other clients
+```
+
+### Weapon Specs
+
+| Weapon | Type | RPM | Damage | Range | Mag | Special |
+|--------|------|-----|--------|-------|-----|---------|
+| AK47 | AR | 600 | 36 | 4000cm | 30 | 1 pen, Auto/Single |
+| MP5 | SMG | 800 | 24 | 2500cm | 25 | Low recoil |
+| AWM | Sniper | 45 | 120 | 10000cm | 5 | 3x headshot |
+| S12 | Shotgun | 120 | 18x8 | 1000cm | 8 | 8 pellets |
+| M9 | Pistol | 400 | 30 | 3000cm | 15 | Single only |
+| Frag | Grenade | — | 150 | 500r | 1+4 | Radial damage |
+| Knife | Melee | 120 | 50 | 200cm | — | 60° arc |
+
+## Next: Phase 4 — Inventory System
+
+Will include: Backpack, Loot UI, Drag Drop, Equipment Slots, Attachments, Healing, Throwables.
 

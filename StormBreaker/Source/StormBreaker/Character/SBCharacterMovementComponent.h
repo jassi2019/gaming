@@ -146,6 +146,8 @@ private:
     bool CanStandFromProne() const;
     void UpdateProneCollision(bool bEnteringProne);
 
+    friend class FSBSavedMove;
+
     // --- Flags (replicated via saved move) ---
     uint8 bWantsToSprint : 1;
     uint8 bIsProning : 1;

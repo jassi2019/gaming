@@ -77,6 +77,15 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
     int32 NumberOfBots = 0;
 
+    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    bool bAutoSpawnArena = true;
+
+    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    bool bAutoStartZone = true;
+
+    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    float ZoneStartDelay = 10.0f;
+
     // --- Starter Weapon (auto-created for testing) ---
 
     UPROPERTY()
@@ -89,12 +98,17 @@ protected:
 
 private:
     void SpawnBots();
+    void SpawnArena();
+    void StartZonePhases();
     void CheckWinCondition();
+    void ShowMatchResults();
     void HandlePlayerEliminated(AController* EliminatedPlayer, AController* Killer);
+    int32 CalculateRankPointsDelta(int32 Placement, int32 Kills) const;
 
     ESBMatchPhase CurrentPhase;
     int32 AlivePlayerCount;
     int32 AliveTeamCount;
+    float MatchStartTime;
     FTimerHandle ZoneShrinkTimerHandle;
     FTimerHandle WarmUpTimerHandle;
 };

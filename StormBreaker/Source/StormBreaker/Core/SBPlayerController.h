@@ -64,7 +64,7 @@ public:
     UFUNCTION(Server, Reliable)
     void Server_RequestRespawn();
 
-protected:
+public:
     UFUNCTION(Client, Reliable)
     void Client_OnMatchEnd(bool bIsWinner);
 

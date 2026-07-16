@@ -7,6 +7,7 @@
 #include "SBBattleRoyaleGameMode.generated.h"
 
 class ASBBattleRoyaleGameState;
+class USBWeaponDataAsset;
 
 UENUM(BlueprintType)
 enum class ESBMatchPhase : uint8
@@ -75,6 +76,13 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
     int32 NumberOfBots = 0;
+
+    // --- Starter Weapon (auto-created for testing) ---
+
+    UPROPERTY()
+    TObjectPtr<USBWeaponDataAsset> StarterWeaponData;
+
+    void GiveStarterWeapon(APlayerController* PC);
 
 protected:
     virtual void Tick(float DeltaSeconds) override;

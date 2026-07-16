@@ -210,7 +210,7 @@ void ASBGameFlowHUD::DrawSplashScreen()
     UFont* SmallFont = GEngine->GetSmallFont();
 
     // Game title
-    FString Title = TEXT("STORMBREAKER");
+    FString Title = TEXT("ISLAND OF DEATH");
     float TW, TH;
     Canvas->TextSize(LargeFont, Title, TW, TH);
     Canvas->SetDrawColor(FColor(255, 200, 50));
@@ -261,7 +261,7 @@ void ASBGameFlowHUD::DrawLoginScreen()
     float TW, TH;
 
     // Title
-    FString Title = TEXT("STORMBREAKER");
+    FString Title = TEXT("ISLAND OF DEATH");
     Canvas->TextSize(LargeFont, Title, TW, TH);
     Canvas->SetDrawColor(FColor(255, 200, 50));
     Canvas->DrawText(LargeFont, Title, (SW - TW) * 0.5f, SH * 0.15f);
@@ -374,7 +374,7 @@ void ASBGameFlowHUD::DrawLobbyScreen()
     Canvas->DrawText(MedFont, ModeText, (SW - TW) * 0.5f, SH * 0.15f);
 
     // Map name
-    FString MapText = TEXT("Map: StormBreaker Island");
+    FString MapText = TEXT("Map: Island of Death");
     Canvas->TextSize(SmallFont, MapText, TW, TH);
     Canvas->SetDrawColor(FColor(180, 180, 180));
     Canvas->DrawText(SmallFont, MapText, (SW - TW) * 0.5f, SH * 0.15f + 35.0f);

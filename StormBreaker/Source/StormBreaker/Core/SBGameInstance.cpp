@@ -71,6 +71,13 @@ void USBGameInstance::HostSession(int32 MaxPlayers, bool bIsDedicatedServer)
 
 void USBGameInstance::OnCreateSessionComplete(FName SessionName, bool bSuccessful)
 {
+    IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+    if (OnlineSub)
+    {
+        IOnlineSessionPtr SI = OnlineSub->GetSessionInterface();
+        if (SI.IsValid()) SI->ClearOnCreateSessionCompleteDelegates(this);
+    }
+
     if (bSuccessful)
     {
         UE_LOG(LogSBMultiplayer, Log, TEXT("Session '%s' created. Travelling to match map."), *SessionName.ToString());
@@ -104,6 +111,12 @@ void USBGameInstance::FindAndJoinSession()
 void USBGameInstance::OnFindSessionsComplete(bool bSuccessful)
 {
     IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+    if (OnlineSub)
+    {
+        IOnlineSessionPtr SI = OnlineSub->GetSessionInterface();
+        if (SI.IsValid()) SI->ClearOnFindSessionsCompleteDelegates(this);
+    }
+
     if (!OnlineSub || !bSuccessful || !SessionSearch.IsValid()) return;
 
     IOnlineSessionPtr SessionInterface = OnlineSub->GetSessionInterface();
@@ -124,13 +137,19 @@ void USBGameInstance::OnFindSessionsComplete(bool bSuccessful)
 
 void USBGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
+    IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+    if (OnlineSub)
+    {
+        IOnlineSessionPtr SI = OnlineSub->GetSessionInterface();
+        if (SI.IsValid()) SI->ClearOnJoinSessionCompleteDelegates(this);
+    }
+
     if (Result != EOnJoinSessionCompleteResult::Success)
     {
         UE_LOG(LogSBMultiplayer, Error, TEXT("Failed to join session '%s'. Result: %d"), *SessionName.ToString(), (int32)Result);
         return;
     }
 
-    IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
     if (!OnlineSub) return;
 
     IOnlineSessionPtr SessionInterface = OnlineSub->GetSessionInterface();
@@ -167,6 +186,13 @@ void USBGameInstance::DestroyCurrentSession()
 
 void USBGameInstance::OnDestroySessionComplete(FName SessionName, bool bSuccessful)
 {
+    IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+    if (OnlineSub)
+    {
+        IOnlineSessionPtr SI = OnlineSub->GetSessionInterface();
+        if (SI.IsValid()) SI->ClearOnDestroySessionCompleteDelegates(this);
+    }
+
     UE_LOG(LogSBMultiplayer, Log, TEXT("Session '%s' destroyed. Success: %s"),
         *SessionName.ToString(), bSuccessful ? TEXT("true") : TEXT("false"));
 }

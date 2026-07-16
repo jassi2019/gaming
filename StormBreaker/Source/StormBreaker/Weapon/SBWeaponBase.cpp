@@ -336,13 +336,6 @@ void ASBWeaponBase::CycleFireMode()
     if (!WeaponData || WeaponData->AvailableFireModes.Num() <= 1) return;
 
     Server_CycleFireMode();
-
-    int32 CurrentIndex = WeaponData->AvailableFireModes.IndexOfByKey(CurrentFireMode);
-    int32 NextIndex = (CurrentIndex + 1) % WeaponData->AvailableFireModes.Num();
-    CurrentFireMode = WeaponData->AvailableFireModes[NextIndex];
-    OnFireModeChanged.Broadcast(CurrentFireMode);
-
-    UE_LOG(LogSBWeapon, Verbose, TEXT("Fire mode: %d"), (int32)CurrentFireMode);
 }
 
 void ASBWeaponBase::Equip(ASBCharacterBase* NewOwner)

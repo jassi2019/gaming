@@ -18,6 +18,7 @@ class STORMBREAKER_API ASBDoorActor : public AActor
 public:
     ASBDoorActor();
 
+    virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -42,6 +43,7 @@ protected:
 
 private:
     float CurrentAngle;
+    UPROPERTY(Replicated)
     float TargetAngle;
     FRotator ClosedRotation;
 };

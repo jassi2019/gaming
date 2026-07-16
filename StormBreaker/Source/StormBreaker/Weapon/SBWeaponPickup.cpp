@@ -56,6 +56,7 @@ void ASBWeaponPickup::BeginPlay()
     InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ASBWeaponPickup::OnOverlapBegin);
 
     BobTimer = FMath::FRandRange(0.0f, UE_TWO_PI);
+    BaseZ = GetActorLocation().Z;
 }
 
 void ASBWeaponPickup::Tick(float DeltaTime)
@@ -65,7 +66,7 @@ void ASBWeaponPickup::Tick(float DeltaTime)
     // Gentle bob and rotate
     BobTimer += DeltaTime * 2.0f;
     FVector NewLocation = GetActorLocation();
-    NewLocation.Z += FMath::Sin(BobTimer) * 0.3f;
+    NewLocation.Z = BaseZ + FMath::Sin(BobTimer) * 15.0f;
     SetActorLocation(NewLocation);
     AddActorWorldRotation(FRotator(0.0f, 45.0f * DeltaTime, 0.0f));
 }

@@ -23,15 +23,23 @@ ASBDoorActor::ASBDoorActor()
     DoorMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     DoorMesh->SetCollisionResponseToAllChannels(ECR_Block);
 
+    ClosedRotation = FRotator::ZeroRotator;
     bIsOpen = false;
     CurrentAngle = 0.0f;
     TargetAngle = 0.0f;
+}
+
+void ASBDoorActor::BeginPlay()
+{
+    Super::BeginPlay();
+    ClosedRotation = GetActorRotation();
 }
 
 void ASBDoorActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(ASBDoorActor, bIsOpen);
+    DOREPLIFETIME(ASBDoorActor, TargetAngle);
 }
 
 void ASBDoorActor::ToggleDoor(AActor* Interactor)
@@ -65,7 +73,7 @@ void ASBDoorActor::ToggleDoor(AActor* Interactor)
 
 void ASBDoorActor::OnRep_IsOpen()
 {
-    TargetAngle = bIsOpen ? OpenAngle : 0.0f;
+    /* TargetAngle is replicated, nothing to do here */
 }
 
 void ASBDoorActor::Tick(float DeltaTime)

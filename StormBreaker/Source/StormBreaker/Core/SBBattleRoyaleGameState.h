@@ -90,4 +90,5 @@ private:
 
     bool bIsZoneShrinking;
     float ZoneShrinkElapsed;
+    float ZoneShrinkStartRadius;
 };

@@ -66,7 +66,8 @@ void USBKnockReviveComponent::SetLifeState(ESBPlayerLifeState NewState)
     LifeState = NewState;
     OnLifeStateChanged.Broadcast(NewState);
 
-    ASBPlayerState* PS = Cast<ASBPlayerState>(Cast<APawn>(GetOwner())->GetPlayerState());
+    APawn* OwnerPawn = Cast<APawn>(GetOwner());
+    ASBPlayerState* PS = OwnerPawn ? Cast<ASBPlayerState>(OwnerPawn->GetPlayerState()) : nullptr;
     if (PS)
     {
         ESBPlayerStatus Status;

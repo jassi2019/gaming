@@ -49,6 +49,7 @@ void ASBBattleRoyaleGameState::BeginZoneShrink()
 {
     bIsZoneShrinking = true;
     ZoneShrinkElapsed = 0.0f;
+    ZoneShrinkStartRadius = ZoneData.CurrentRadius;
     UE_LOG(LogSBBattleRoyale, Log, TEXT("Zone shrink started. Phase: %d, Target radius: %.0f"),
         ZoneData.CurrentPhaseIndex, ZoneData.TargetRadius);
 }
@@ -93,8 +94,7 @@ void ASBBattleRoyaleGameState::UpdateZoneShrink(float DeltaSeconds)
     ZoneShrinkElapsed += DeltaSeconds;
 
     float Alpha = FMath::Clamp(ZoneShrinkElapsed / ZoneData.ShrinkDuration, 0.0f, 1.0f);
-    float StartRadius = ZoneData.CurrentRadius;
-    float InterpRadius = FMath::Lerp(StartRadius, ZoneData.TargetRadius, Alpha);
+    float InterpRadius = FMath::Lerp(ZoneShrinkStartRadius, ZoneData.TargetRadius, Alpha);
     ZoneData.CurrentRadius = InterpRadius;
 
     if (Alpha >= 1.0f)

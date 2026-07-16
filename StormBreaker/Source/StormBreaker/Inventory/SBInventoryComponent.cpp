@@ -168,7 +168,7 @@ void USBInventoryComponent::MoveItem(int32 FromSlot, int32 ToSlot)
     }
     else
     {
-        Items[FromSlot].SlotIndex = ToSlot;
+        return;
     }
 
     OnInventoryChanged.Broadcast();
@@ -240,7 +240,8 @@ bool USBInventoryComponent::EquipArmor(const FName& ItemID)
     switch (Def->ArmorSlot)
     {
     case ESBArmorSlot::Helmet:
-        if (Equipment.HelmetLevel >= Def->ArmorLevel) return false;
+        if (Equipment.HelmetLevel > Def->ArmorLevel) return false;
+        if (Equipment.HelmetLevel == Def->ArmorLevel && Equipment.HelmetDurability >= Def->Durability) return false;
         if (!Equipment.HelmetItemID.IsNone()) UnequipArmor(ESBArmorSlot::Helmet);
         Equipment.HelmetItemID = ItemID;
         Equipment.HelmetLevel = Def->ArmorLevel;
@@ -248,7 +249,8 @@ bool USBInventoryComponent::EquipArmor(const FName& ItemID)
         break;
 
     case ESBArmorSlot::Vest:
-        if (Equipment.VestLevel >= Def->ArmorLevel) return false;
+        if (Equipment.VestLevel > Def->ArmorLevel) return false;
+        if (Equipment.VestLevel == Def->ArmorLevel && Equipment.VestDurability >= Def->Durability) return false;
         if (!Equipment.VestItemID.IsNone()) UnequipArmor(ESBArmorSlot::Vest);
         Equipment.VestItemID = ItemID;
         Equipment.VestLevel = Def->ArmorLevel;
@@ -256,7 +258,7 @@ bool USBInventoryComponent::EquipArmor(const FName& ItemID)
         break;
 
     case ESBArmorSlot::Backpack:
-        if (Equipment.BackpackLevel >= Def->ArmorLevel) return false;
+        if (Equipment.BackpackLevel > Def->ArmorLevel) return false;
         if (!Equipment.BackpackItemID.IsNone()) UnequipArmor(ESBArmorSlot::Backpack);
         Equipment.BackpackItemID = ItemID;
         Equipment.BackpackLevel = Def->ArmorLevel;

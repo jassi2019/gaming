@@ -144,7 +144,7 @@ void USBParachuteComponent::TickDeployed(float DeltaTime)
 
     FVector Velocity = Forward * ParachuteForwardSpeed * ForwardInput
                      + FVector(0, 0, -ParachuteDescendSpeed)
-                     + WindOffset * DeltaTime;
+                     + WindOffset;
 
     Location += Velocity * DeltaTime;
     Owner->SetActorLocation(Location);

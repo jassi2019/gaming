@@ -62,4 +62,5 @@ protected:
 
 private:
     float BobTimer;
+    float BaseZ;
 };

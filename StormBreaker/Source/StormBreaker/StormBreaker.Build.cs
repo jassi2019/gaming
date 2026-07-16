@@ -55,7 +55,9 @@ public class StormBreaker : ModuleRules
             "OnlineSubsystemEOS",
             "HTTP",
             "Json",
-            "JsonUtilities"
+            "JsonUtilities",
+            "Media",
+            "MediaAssets"
         });
     }
 }

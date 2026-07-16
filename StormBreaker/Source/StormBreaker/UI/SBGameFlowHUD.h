@@ -4,7 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "MediaPlayer.h"
 #include "SBGameFlowHUD.generated.h"
+
+class UMediaPlayer;
+class UMediaSource;
+class UMediaTexture;
 
 UENUM(BlueprintType)
 enum class ESBFlowScreen : uint8
@@ -36,7 +41,19 @@ public:
     void GoToScreen(ESBFlowScreen Screen);
 
     UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Flow")
-    float SplashDuration = 3.0f;
+    float SplashDuration = 5.0f;
+
+    // --- Splash Video ---
+
+    UPROPERTY()
+    TObjectPtr<UMediaPlayer> SplashMediaPlayer;
+
+    UPROPERTY()
+    TObjectPtr<UMediaTexture> SplashMediaTexture;
+
+    void SetupSplashVideo();
+    void DrawSplashVideo();
+    bool bSplashVideoPlaying;
 
 private:
     // --- Screen Draws ---

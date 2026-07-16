@@ -1,6 +1,9 @@
 // Copyright StormBreaker Games. All Rights Reserved.
 
 #include "UI/SBGameFlowHUD.h"
+#include "MediaPlayer.h"
+#include "MediaTexture.h"
+#include "FileMediaSource.h"
 #include "Character/SBCharacterBase.h"
 #include "Character/SBCharacterMovementComponent.h"
 #include "Weapon/SBWeaponComponent.h"
@@ -30,11 +33,61 @@ ASBGameFlowHUD::ASBGameFlowHUD()
     SelectedBotCount = 5;
     bMatchStartRequested = false;
     bMouseWasPressed = false;
+    bSplashVideoPlaying = false;
+}
+
+void ASBGameFlowHUD::SetupSplashVideo()
+{
+    // Create media player at runtime
+    SplashMediaPlayer = NewObject<UMediaPlayer>(this);
+    if (!SplashMediaPlayer) return;
+
+    SplashMediaPlayer->SetLooping(false);
+    SplashMediaPlayer->PlayOnOpen = true;
+
+    // Create media texture to render the video
+    SplashMediaTexture = NewObject<UMediaTexture>(this);
+    if (SplashMediaTexture)
+    {
+        SplashMediaTexture->SetMediaPlayer(SplashMediaPlayer);
+        SplashMediaTexture->UpdateResource();
+    }
+
+    // Try to open the splash video from disk
+    FString VideoPath = FPaths::ProjectContentDir() / TEXT("Splash/SplashVideo.mp4");
+    if (FPaths::FileExists(VideoPath))
+    {
+        bSplashVideoPlaying = SplashMediaPlayer->OpenUrl(VideoPath);
+        UE_LOG(LogStormBreaker, Log, TEXT("Splash video: %s (opened: %s)"),
+            *VideoPath, bSplashVideoPlaying ? TEXT("yes") : TEXT("no"));
+    }
+    else
+    {
+        UE_LOG(LogStormBreaker, Warning, TEXT("Splash video not found: %s"), *VideoPath);
+    }
+}
+
+void ASBGameFlowHUD::DrawSplashVideo()
+{
+    if (!SplashMediaTexture || !SplashMediaPlayer) return;
+    if (!SplashMediaPlayer->IsPlaying() && ScreenTimer > 0.5f)
+    {
+        bSplashVideoPlaying = false;
+        return;
+    }
+
+    // Draw video texture to full screen via Canvas
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawTile(SplashMediaTexture, 0, 0, Canvas->SizeX, Canvas->SizeY,
+        0, 0, 1, 1);
 }
 
 void ASBGameFlowHUD::BeginPlay()
 {
     Super::BeginPlay();
+
+    // Setup splash video
+    SetupSplashVideo();
 
     // Start on Splash screen — hide the character
     APlayerController* PC = GetOwningPlayerController();
@@ -141,6 +194,15 @@ void ASBGameFlowHUD::DrawSplashScreen()
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
 
+    // Try video first
+    if (bSplashVideoPlaying)
+    {
+        DrawRect(FLinearColor::Black, 0, 0, SW, SH);
+        DrawSplashVideo();
+        return;
+    }
+
+    // Fallback: canvas-drawn splash
     // Black background
     DrawRect(FLinearColor::Black, 0, 0, SW, SH);
 

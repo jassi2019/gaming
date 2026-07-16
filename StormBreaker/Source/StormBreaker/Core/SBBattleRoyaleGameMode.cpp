@@ -14,7 +14,7 @@
 #include "BattleRoyale/SBZoneManager.h"
 #include "Backend/SBBackendSubsystem.h"
 #include "Backend/SBBackendTypes.h"
-#include "UI/SBInGameHUD.h"
+#include "UI/SBGameFlowHUD.h"
 #include "StormBreaker.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,9 +32,10 @@ ASBBattleRoyaleGameMode::ASBBattleRoyaleGameMode()
     GameStateClass = ASBBattleRoyaleGameState::StaticClass();
     PlayerStateClass = ASBPlayerState::StaticClass();
     PlayerControllerClass = ASBPlayerController::StaticClass();
-    HUDClass = ASBInGameHUD::StaticClass();
+    HUDClass = ASBGameFlowHUD::StaticClass();
 
-    MinPlayersToStart = 1;
+    // Match doesn't auto-start — lobby screen handles it
+    MinPlayersToStart = 100;
     NumberOfBots = 5;
 }
 
@@ -177,10 +178,7 @@ void ASBBattleRoyaleGameMode::PostLogin(APlayerController* NewPlayer)
 
     UE_LOG(LogSBBattleRoyale, Log, TEXT("Player joined. Alive: %d"), AlivePlayerCount);
 
-    if (CurrentPhase == ESBMatchPhase::WaitingForPlayers && AlivePlayerCount >= MinPlayersToStart)
-    {
-        StartMatch();
-    }
+    // Match start is controlled by lobby screen (SBGameFlowHUD)
 
     // Give starter weapon
     FTimerHandle WeaponTimer;

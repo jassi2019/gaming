@@ -79,19 +79,19 @@ public:
     // --- Config ---
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    float MapSizeKm = 4.0f;
+    float MapSizeKm = 2.0f;
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 TerrainResolution = 64;
+    int32 TerrainResolution = 16;
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    float TerrainMaxHeight = 3000.0f;
+    float TerrainMaxHeight = 1500.0f;
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 TreeCount = 500;
+    int32 TreeCount = 80;
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 RockCount = 200;
+    int32 RockCount = 40;
 
     UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
     TArray<FSBPOI> POIs;

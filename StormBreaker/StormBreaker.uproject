@@ -1,0 +1,45 @@
+{
+    "FileVersion": 3,
+    "EngineAssociation": "5.6",
+    "Category": "",
+    "Description": "StormBreaker - Battle Royale Game",
+    "Modules": [
+        {
+            "Name": "StormBreaker",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "AdditionalDependencies": [
+                "Engine",
+                "CoreUObject",
+                "UMG",
+                "AIModule",
+                "GameplayAbilities",
+                "EnhancedInput",
+                "OnlineSubsystem",
+                "OnlineSubsystemEOS",
+                "Niagara"
+            ]
+        },
+        {
+            "Name": "StormBreakerServer",
+            "Type": "Server",
+            "LoadingPhase": "Default"
+        }
+    ],
+    "Plugins": [
+        { "Name": "EnhancedInput", "Enabled": true },
+        { "Name": "GameplayAbilities", "Enabled": true },
+        { "Name": "OnlineSubsystemEOS", "Enabled": true },
+        { "Name": "OnlineSubsystem", "Enabled": true },
+        { "Name": "Niagara", "Enabled": true },
+        { "Name": "Water", "Enabled": true },
+        { "Name": "ChaosVehiclesPlugin", "Enabled": true },
+        { "Name": "AudioModulation", "Enabled": true },
+        { "Name": "Metasound", "Enabled": true },
+        { "Name": "NavigationSystem", "Enabled": true }
+    ],
+    "TargetPlatforms": [
+        "Android",
+        "Windows"
+    ]
+}

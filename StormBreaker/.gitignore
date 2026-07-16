@@ -1,0 +1,29 @@
+# UE5 Build
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+
+# OS
+Thumbs.db
+.DS_Store
+*.swp
+
+# Compiled assets (keep source only)
+*.uasset
+*.umap
+
+# Packaging
+Releases/
+*.pak

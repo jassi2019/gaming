@@ -13,7 +13,7 @@
 ASBProjectileBase::ASBProjectileBase()
 {
     bReplicates = true;
-    SetReplicatingMovement(true);
+    SetReplicateMovement(true);
     InitialLifeSpan = 5.0f;
 
     CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));

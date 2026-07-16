@@ -8,7 +8,10 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UStaticMeshComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
+class USoundBase;
 
 /**
  * Base projectile actor for non-hitscan weapons and grenades.

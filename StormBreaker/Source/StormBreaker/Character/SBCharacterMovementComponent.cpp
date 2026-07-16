@@ -148,7 +148,7 @@ void USBCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
         if (IsCrouching())
         {
             bWantsToCrouch = false;
-            UnCrouch();
+            bWantsToCrouch = false;
         }
     }
 }
@@ -165,7 +165,7 @@ void USBCharacterMovementComponent::StartSprinting()
     if (IsCrouching())
     {
         bWantsToCrouch = false;
-        UnCrouch();
+        bWantsToCrouch = false;
     }
 }
 
@@ -193,7 +193,7 @@ void USBCharacterMovementComponent::StartProne()
     if (IsCrouching())
     {
         bWantsToCrouch = false;
-        UnCrouch();
+        bWantsToCrouch = false;
     }
 
     bIsProning = true;

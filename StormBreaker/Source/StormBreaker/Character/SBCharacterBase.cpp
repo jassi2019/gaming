@@ -13,6 +13,8 @@
 #include "AbilitySystemComponent.h"
 #include "Weapon/SBWeaponComponent.h"
 #include "Weapon/SBWeaponTypes.h"
+#include "Inventory/SBInventoryComponent.h"
+#include "BattleRoyale/SBKnockReviveComponent.h"
 #include "Core/SBPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -67,6 +69,12 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
 
     // Weapon component
     WeaponComponent = CreateDefaultSubobject<USBWeaponComponent>(TEXT("WeaponComponent"));
+
+    // Inventory component
+    InventoryComponent = CreateDefaultSubobject<USBInventoryComponent>(TEXT("InventoryComponent"));
+
+    // Knock/Revive component
+    KnockReviveComponent = CreateDefaultSubobject<USBKnockReviveComponent>(TEXT("KnockReviveComponent"));
 
     // Initialize camera state
     CurrentBoomLength = DefaultBoomLength;

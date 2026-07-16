@@ -10,6 +10,8 @@
 
 class USBCharacterMovementComponent;
 class USBWeaponComponent;
+class USBInventoryComponent;
+class USBKnockReviveComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -113,6 +115,12 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
     TObjectPtr<USBWeaponComponent> WeaponComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    TObjectPtr<USBInventoryComponent> InventoryComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    TObjectPtr<USBKnockReviveComponent> KnockReviveComponent;
 
     // --- Stance ---
 

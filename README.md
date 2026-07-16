@@ -26,7 +26,7 @@ Original assets, branding, characters, maps, UI, sounds, and mechanics. No copyr
 | 1 | Project Architecture | ✅ Complete |
 | 2 | Third Person Character | ✅ Complete |
 | 3 | Weapon System | ✅ Complete |
-| 4 | Inventory System | ⬜ Pending |
+| 4 | Inventory & Loot & BR Core | ✅ Complete |
 | 5 | Battle Royale Mechanics | ⬜ Pending |
 | 6 | Multiplayer | ⬜ Pending |
 | 7 | AI Bots | ⬜ Pending |
@@ -121,7 +121,8 @@ StormBreaker/
 │   ├── 03_AssetPipeline.md
 │   ├── 04_BlueprintSetup.md
 │   ├── 05_Phase2_CharacterSetup.md
-│   └── 06_Phase3_WeaponSystem.md
+│   ├── 06_Phase3_WeaponSystem.md
+│   └── 07_Phase4_InventoryLoot.md
 ├── Plugins/
 ├── Tests/
 ├── .gitignore
@@ -215,7 +216,25 @@ Server: validate fire rate + ammo (anti-cheat)
 | Frag | Grenade | — | 150 | 500r | 1+4 | Radial damage |
 | Knife | Melee | 120 | 50 | 200cm | — | 60° arc |
 
-## Next: Phase 4 — Inventory System
+## Phase 4 — Inventory, Loot & Battle Royale Core (Complete)
 
-Will include: Backpack, Loot UI, Drag Drop, Equipment Slots, Attachments, Healing, Throwables.
+### New C++ Classes
 
+| Class | Purpose |
+|-------|---------|
+| `FSBItemDefinition` | DataTable row defining all item properties — weapon, ammo, consumable, armor, backpack, attachment |
+| `USBInventoryComponent` | Backpack inventory with weight/capacity, equipment (helmet/vest/backpack), consumable use (timed+cancellable), boost system (passive regen), auto-loot settings |
+| `USBLootManager` | WorldSubsystem for weighted random loot generation from DataTables — building loot, air drop loot |
+| `ASBDeathCrate` | Spawned on death with all player items, lootable by other players, auto-destroys when empty |
+| `USBKnockReviveComponent` | Alive → Knocked (90s bleed-out, crawl only) → Revive (10s, 300u range) → Dead → Spectator |
+
+### Systems
+
+- **Armor:** L1/L2/L3 helmet+vest with 30%/40%/55% damage reduction, durability that depletes and breaks
+- **Consumables:** Bandage (10HP/4s/cap75), FirstAid (75HP/6s/cap75), MedKit (100HP/8s), EnergyDrink (+40 boost), Painkiller (+60 boost), Adrenaline (+100 boost)
+- **Boost:** 0-100 scale, decays 3/s, tiers at 20/40/60 give 2/4/6 HP regen/s, 60+ gives 6.5% speed bonus
+- **Knock/Revive:** Team-mode aware, solo = instant death, knocked players crawl at 50cm/s
+
+## Next: Phase 5 — Battle Royale Mechanics
+
+Will include: Plane spawn, jump, parachute, safe zone, blue zone damage, random loot spawns, air drops, vehicles.

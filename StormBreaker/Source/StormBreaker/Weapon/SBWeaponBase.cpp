@@ -8,6 +8,7 @@
 #include "Core/SBPlayerState.h"
 #include "StormBreaker.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "EngineUtils.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,7 +25,7 @@ ASBWeaponBase::ASBWeaponBase()
 {
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
-    SetReplicatingMovement(false);
+    SetReplicateMovement(false);
 
     WeaponMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
     RootComponent = WeaponMeshComp;

@@ -17,6 +17,7 @@
 #include "BattleRoyale/SBKnockReviveComponent.h"
 #include "BattleRoyale/SBParachuteComponent.h"
 #include "BattleRoyale/SBMinimapDataComponent.h"
+#include "Multiplayer/SBAntiCheatComponent.h"
 #include "Core/SBPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -83,6 +84,9 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
 
     // Minimap data component
     MinimapDataComponent = CreateDefaultSubobject<USBMinimapDataComponent>(TEXT("MinimapDataComponent"));
+
+    // Anti-cheat component (server-only validation)
+    AntiCheatComponent = CreateDefaultSubobject<USBAntiCheatComponent>(TEXT("AntiCheatComponent"));
 
     // Initialize camera state
     CurrentBoomLength = DefaultBoomLength;

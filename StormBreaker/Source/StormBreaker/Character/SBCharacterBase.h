@@ -14,6 +14,7 @@ class USBInventoryComponent;
 class USBKnockReviveComponent;
 class USBParachuteComponent;
 class USBMinimapDataComponent;
+class USBAntiCheatComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -129,6 +130,9 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
     TObjectPtr<USBMinimapDataComponent> MinimapDataComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    TObjectPtr<USBAntiCheatComponent> AntiCheatComponent;
 
     // --- Stance ---
 

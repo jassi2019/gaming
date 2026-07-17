@@ -25,7 +25,6 @@
 
 ASBGameFlowHUD::ASBGameFlowHUD()
 {
-    // Skip canvas splash — startup videos handle it now
     CurrentScreen = ESBFlowScreen::Login;
     ScreenTimer = 0.0f;
     CachedFPS = 60.0f;
@@ -35,6 +34,13 @@ ASBGameFlowHUD::ASBGameFlowHUD()
     bMatchStartRequested = false;
     bMouseWasPressed = false;
     bSplashVideoPlaying = false;
+
+    // Transition state
+    bTransitioning = false;
+    TransitionTarget = ESBFlowScreen::Login;
+    TransitionTimer = 0.0f;
+    TransitionDuration = 0.8f;
+    bTransitionFadingOut = true;
 }
 
 void ASBGameFlowHUD::SetupSplashVideo()
@@ -141,15 +147,66 @@ void ASBGameFlowHUD::Tick(float DeltaTime)
     // Auto-advance from Splash to Login
     if (CurrentScreen == ESBFlowScreen::Splash && ScreenTimer >= SplashDuration)
     {
-        GoToScreen(ESBFlowScreen::Login);
+        StartTransition(ESBFlowScreen::Login);
     }
 
-    // Track mouse click state
+    // Handle smooth transition
+    if (bTransitioning)
+    {
+        TransitionTimer += DeltaTime;
+        float HalfDur = TransitionDuration * 0.5f;
+
+        if (bTransitionFadingOut && TransitionTimer >= HalfDur)
+        {
+            // Midpoint: switch screen
+            bTransitionFadingOut = false;
+            GoToScreen(TransitionTarget);
+        }
+
+        if (TransitionTimer >= TransitionDuration)
+        {
+            bTransitioning = false;
+            TransitionTimer = 0.0f;
+        }
+    }
+
+    // Track mouse click state (block clicks during transition)
     APlayerController* PC = GetOwningPlayerController();
     if (PC)
     {
-        bMouseWasPressed = PC->WasInputKeyJustPressed(EKeys::LeftMouseButton);
+        bMouseWasPressed = !bTransitioning && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton);
     }
+}
+
+void ASBGameFlowHUD::StartTransition(ESBFlowScreen Target, float Duration)
+{
+    if (bTransitioning) return;
+    bTransitioning = true;
+    TransitionTarget = Target;
+    TransitionTimer = 0.0f;
+    TransitionDuration = Duration;
+    bTransitionFadingOut = true;
+}
+
+void ASBGameFlowHUD::DrawTransitionOverlay()
+{
+    if (!bTransitioning) return;
+
+    float HalfDur = TransitionDuration * 0.5f;
+    float Alpha;
+
+    if (bTransitionFadingOut)
+    {
+        // Fade to black
+        Alpha = FMath::Clamp(TransitionTimer / HalfDur, 0.0f, 1.0f);
+    }
+    else
+    {
+        // Fade from black
+        Alpha = FMath::Clamp(1.0f - (TransitionTimer - HalfDur) / HalfDur, 0.0f, 1.0f);
+    }
+
+    DrawRect(FLinearColor(0, 0, 0, Alpha), 0, 0, Canvas->SizeX, Canvas->SizeY);
 }
 
 void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
@@ -201,6 +258,16 @@ void ASBGameFlowHUD::DrawHUD()
     case ESBFlowScreen::Login:  DrawLoginScreen();  break;
     case ESBFlowScreen::Lobby:  DrawLobbyScreen();  break;
     case ESBFlowScreen::InGame: DrawInGameHUD();    break;
+    }
+
+    // Smooth fade overlay on top
+    DrawTransitionOverlay();
+
+    // Fade-in when login screen first appears (from splash video)
+    if (CurrentScreen == ESBFlowScreen::Login && !bTransitioning && ScreenTimer < 1.0f)
+    {
+        float FadeIn = 1.0f - FMath::Clamp(ScreenTimer / 1.0f, 0.0f, 1.0f);
+        DrawRect(FLinearColor(0, 0, 0, FadeIn), 0, 0, Canvas->SizeX, Canvas->SizeY);
     }
 }
 
@@ -351,72 +418,299 @@ void ASBGameFlowHUD::DrawLoginScreen()
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
 
-    // Dark background
-    DrawRect(FLinearColor(0.05f, 0.05f, 0.08f), 0, 0, SW, SH);
-
     UFont* LargeFont = GEngine->GetLargeFont();
     UFont* MedFont = GEngine->GetMediumFont();
     UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
     float TW, TH;
 
-    // Title
-    FString Title = TEXT("ISLAND OF DEATH");
-    Canvas->TextSize(LargeFont, Title, TW, TH);
-    Canvas->SetDrawColor(FColor(255, 200, 50));
-    Canvas->DrawText(LargeFont, Title, (SW - TW) * 0.5f, SH * 0.15f);
+    // ====== BACKGROUND ======
+    // Deep black base
+    DrawRect(FLinearColor(0.02f, 0.02f, 0.03f), 0, 0, SW, SH);
 
-    // Welcome text
-    FString Welcome = TEXT("Welcome, Soldier");
-    Canvas->TextSize(MedFont, Welcome, TW, TH);
-    Canvas->SetDrawColor(FColor::White);
-    Canvas->DrawText(MedFont, Welcome, (SW - TW) * 0.5f, SH * 0.30f);
+    // Subtle dark red gradient at top (cinematic feel)
+    for (int32 i = 0; i < 8; i++)
+    {
+        float Y = i * (SH * 0.05f);
+        float A = 0.06f * (1.0f - (float)i / 8.0f);
+        DrawRect(FLinearColor(0.3f, 0.05f, 0.02f, A), 0, Y, SW, SH * 0.05f);
+    }
 
-    // Guest Login Button
-    float BtnW = 300.0f;
-    float BtnH = 50.0f;
+    // Subtle red glow at bottom edges
+    DrawRect(FLinearColor(0.4f, 0.05f, 0.02f, 0.04f), 0, SH * 0.7f, SW, SH * 0.3f);
+
+    // ====== CORNER ACCENTS (red frame like screenshot) ======
+    DrawCornerAccents(SW, SH, 40.0f, FLinearColor(0.7f, 0.1f, 0.05f, 0.6f));
+
+    // ====== TITLE: "ISLAND OF DEATH" ======
+    // Main title — two parts with different styles
+
+    // "ISLAND" — large, white/silver
+    FString TitleTop = TEXT("ISLAND");
+    Canvas->TextSize(LargeFont, TitleTop, TW, TH);
+    float TitleCenterX = SW * 0.5f;
+    float TitleY = SH * 0.12f;
+
+    // Glow behind title
+    float GlowPulse = 0.7f + 0.3f * FMath::Sin(ScreenTimer * 2.0f);
+    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.08f * GlowPulse),
+        TitleCenterX - TW * 0.7f, TitleY - 10, TW * 1.4f, TH * 3.5f);
+
+    Canvas->SetDrawColor(FColor(230, 230, 240));
+    Canvas->DrawText(LargeFont, TitleTop, TitleCenterX - TW * 0.5f, TitleY);
+
+    // "OF" — smaller, positioned between
+    FString TitleOf = TEXT("OF");
+    Canvas->TextSize(MedFont, TitleOf, TW, TH);
+    Canvas->SetDrawColor(FColor(200, 200, 210, 200));
+    Canvas->DrawText(MedFont, TitleOf, TitleCenterX - TW * 0.5f, TitleY + 38.0f);
+
+    // "DEATH" — large, blood red
+    FString TitleBottom = TEXT("DEATH");
+    Canvas->TextSize(LargeFont, TitleBottom, TW, TH);
+    Canvas->SetDrawColor(FColor(200, 30, 20));
+    Canvas->DrawText(LargeFont, TitleBottom, TitleCenterX - TW * 0.5f, TitleY + 55.0f);
+
+    // ====== TAGLINE with accent lines ======
+    float TaglineY = TitleY + 115.0f;
+
+    // Left accent line
+    float LineW = SW * 0.12f;
+    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.5f), TitleCenterX - LineW - 10, TaglineY + 8, LineW, 1);
+    // Right accent line
+    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.5f), TitleCenterX + 10, TaglineY + 8, LineW, 1);
+
+    // Tagline text — "Some Spirits Don't seek revenge..." in italic white
+    FString Tag1 = TEXT("Some Spirits Don't seek revenge...");
+    Canvas->TextSize(TinyFont, Tag1, TW, TH);
+    Canvas->SetDrawColor(FColor(200, 200, 200, 220));
+    Canvas->DrawText(TinyFont, Tag1, TitleCenterX - TW * 0.5f - 40, TaglineY);
+
+    // "they seek survival" in red
+    FString Tag2 = TEXT("they seek survival");
+    float T1W, T1H;
+    Canvas->TextSize(TinyFont, Tag1, T1W, T1H);
+    Canvas->SetDrawColor(FColor(220, 50, 30, 255));
+    Canvas->DrawText(TinyFont, Tag2, TitleCenterX - TW * 0.5f + T1W - 38, TaglineY);
+
+    // ====== LOGIN BUTTONS ======
+    float BtnW = SW * 0.35f;
+    if (BtnW < 300.0f) BtnW = 300.0f;
+    if (BtnW > 450.0f) BtnW = 450.0f;
+    float BtnH = 48.0f;
     float BtnX = (SW - BtnW) * 0.5f;
-    float BtnY = SH * 0.45f;
+    float BtnStartY = SH * 0.45f;
+    float BtnGap = 12.0f;
 
-    DrawButton(BtnX, BtnY, BtnW, BtnH, TEXT("PLAY AS GUEST"), FLinearColor(0.8f, 0.6f, 0.1f));
+    // --- Continue with Google ---
+    float GoogleY = BtnStartY;
+    DrawLoginButton(BtnX, GoogleY, BtnW, BtnH,
+        TEXT("G"), TEXT("CONTINUE WITH GOOGLE"),
+        FLinearColor(0.92f, 0.92f, 0.90f),   // Light gray bg
+        FLinearColor(0.7f, 0.7f, 0.68f),      // Gray border
+        FLinearColor(0.15f, 0.15f, 0.15f));    // Dark text
 
-    if (IsMouseInRect(BtnX, BtnY, BtnW, BtnH) && WasMouseClicked())
-    {
-        // Login as guest
-        UGameInstance* GI = GetGameInstance();
-        if (GI)
-        {
-            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend)
-            {
-                Backend->Login(ESBAuthProvider::Guest);
-                bLoggedIn = true;
-            }
-        }
-        GoToScreen(ESBFlowScreen::Lobby);
-    }
-
-    // EOS Login Button
-    float Btn2Y = BtnY + BtnH + 20.0f;
-    DrawButton(BtnX, Btn2Y, BtnW, BtnH, TEXT("EPIC GAMES LOGIN"), FLinearColor(0.2f, 0.4f, 0.8f));
-
-    if (IsMouseInRect(BtnX, Btn2Y, BtnW, BtnH) && WasMouseClicked())
+    if (IsMouseInRect(BtnX, GoogleY, BtnW, BtnH) && WasMouseClicked())
     {
         UGameInstance* GI = GetGameInstance();
         if (GI)
         {
             USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend)
-            {
-                Backend->Login(ESBAuthProvider::EOS);
-                bLoggedIn = true;
-            }
+            if (Backend) Backend->Login(ESBAuthProvider::EOS);
         }
-        GoToScreen(ESBFlowScreen::Lobby);
+        StartTransition(ESBFlowScreen::Lobby);
     }
 
-    // Footer
-    Canvas->SetDrawColor(FColor(60, 60, 60));
-    Canvas->DrawText(SmallFont, TEXT("Island Of Death Games | All Rights Reserved"), 20.0f, SH - 30.0f);
+    // --- Continue with Facebook ---
+    float FacebookY = GoogleY + BtnH + BtnGap;
+    DrawLoginButton(BtnX, FacebookY, BtnW, BtnH,
+        TEXT("f"), TEXT("CONTINUE WITH FACEBOOK"),
+        FLinearColor(0.15f, 0.35f, 0.70f),    // Facebook blue
+        FLinearColor(0.2f, 0.45f, 0.85f),     // Lighter blue border
+        FLinearColor(1.0f, 1.0f, 1.0f));       // White text
+
+    if (IsMouseInRect(BtnX, FacebookY, BtnW, BtnH) && WasMouseClicked())
+    {
+        UGameInstance* GI = GetGameInstance();
+        if (GI)
+        {
+            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
+            if (Backend) Backend->Login(ESBAuthProvider::EOS);
+        }
+        StartTransition(ESBFlowScreen::Lobby);
+    }
+
+    // --- Continue with Apple ---
+    float AppleY = FacebookY + BtnH + BtnGap;
+    DrawLoginButton(BtnX, AppleY, BtnW, BtnH,
+        TEXT("A"), TEXT("CONTINUE WITH APPLE"),
+        FLinearColor(0.12f, 0.12f, 0.14f),    // Dark bg
+        FLinearColor(0.35f, 0.35f, 0.38f),     // Gray border
+        FLinearColor(1.0f, 1.0f, 1.0f));       // White text
+
+    if (IsMouseInRect(BtnX, AppleY, BtnW, BtnH) && WasMouseClicked())
+    {
+        UGameInstance* GI = GetGameInstance();
+        if (GI)
+        {
+            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
+            if (Backend) Backend->Login(ESBAuthProvider::EOS);
+        }
+        StartTransition(ESBFlowScreen::Lobby);
+    }
+
+    // ====== OR SEPARATOR ======
+    float OrY = AppleY + BtnH + 18.0f;
+    DrawSeparatorLine(BtnX, OrY, BtnW, TEXT("OR"));
+
+    // ====== PLAY AS GUEST BUTTON (Red border, dark bg) ======
+    float GuestY = OrY + 30.0f;
+    float GuestH = 55.0f;
+
+    // Dark background with red border
+    bool bGuestHover = IsMouseInRect(BtnX, GuestY, BtnW, GuestH);
+    FLinearColor GuestBg = bGuestHover
+        ? FLinearColor(0.15f, 0.04f, 0.03f)
+        : FLinearColor(0.08f, 0.03f, 0.02f);
+    FLinearColor GuestBorder = FLinearColor(0.7f, 0.12f, 0.08f, bGuestHover ? 1.0f : 0.7f);
+
+    DrawRect(GuestBg, BtnX, GuestY, BtnW, GuestH);
+    DrawRoundedBorder(BtnX, GuestY, BtnW, GuestH, GuestBorder, 2.0f);
+
+    // Red soldier icon (simple)
+    Canvas->SetDrawColor(FColor(220, 50, 30));
+    Canvas->DrawText(SmallFont, TEXT(">>"), BtnX + 18, GuestY + 8);
+
+    // "PLAY AS GUEST" — bold red
+    FString GuestTitle = TEXT("PLAY AS GUEST");
+    Canvas->SetDrawColor(FColor(220, 50, 30));
+    Canvas->DrawText(SmallFont, GuestTitle, BtnX + 55, GuestY + 8);
+
+    // "Jump into the island as a guest" — subtitle
+    FString GuestSub = TEXT("Jump into the island as a guest");
+    Canvas->SetDrawColor(FColor(140, 140, 140));
+    Canvas->DrawText(TinyFont, GuestSub, BtnX + 55, GuestY + 30);
+
+    // Arrow on right side
+    Canvas->SetDrawColor(FColor(200, 50, 30));
+    Canvas->DrawText(SmallFont, TEXT(">"), BtnX + BtnW - 30, GuestY + 14);
+
+    if (IsMouseInRect(BtnX, GuestY, BtnW, GuestH) && WasMouseClicked())
+    {
+        UGameInstance* GI = GetGameInstance();
+        if (GI)
+        {
+            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
+            if (Backend) Backend->Login(ESBAuthProvider::Guest);
+        }
+        StartTransition(ESBFlowScreen::Lobby);
+    }
+
+    // ====== GUEST DISCLAIMER ======
+    float DisclaimerY = GuestY + GuestH + 20.0f;
+    FString Disclaimer = TEXT("Your progress as a guest will be");
+    FString Disclaimer2 = TEXT("stored on this device only.");
+    Canvas->TextSize(TinyFont, Disclaimer, TW, TH);
+    Canvas->SetDrawColor(FColor(90, 90, 100));
+    Canvas->DrawText(TinyFont, Disclaimer, (SW - TW) * 0.5f, DisclaimerY);
+    Canvas->TextSize(TinyFont, Disclaimer2, TW, TH);
+    Canvas->DrawText(TinyFont, Disclaimer2, (SW - TW) * 0.5f, DisclaimerY + 16);
+}
+
+// --- Login Screen Helper: Styled Button ---
+void ASBGameFlowHUD::DrawLoginButton(float X, float Y, float W, float H,
+    const FString& IconText, const FString& Label,
+    FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor)
+{
+    bool bHovered = IsMouseInRect(X, Y, W, H);
+    FLinearColor Bg = bHovered ? BgColor * 1.15f : BgColor;
+
+    // Button background
+    DrawRect(Bg, X, Y, W, H);
+
+    // Border
+    DrawRoundedBorder(X, Y, W, H, BorderColor, bHovered ? 2.0f : 1.0f);
+
+    // Highlight on top edge
+    DrawRect(FLinearColor(1, 1, 1, 0.08f), X + 1, Y + 1, W - 2, 1);
+
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    float TW, TH;
+
+    // Icon text (left side)
+    Canvas->SetDrawColor(FColor(
+        (uint8)(TextColor.R * 255),
+        (uint8)(TextColor.G * 255),
+        (uint8)(TextColor.B * 255)));
+    Canvas->DrawText(MedFont, IconText, X + 20, Y + (H - 20) * 0.5f);
+
+    // Separator line
+    DrawRect(FLinearColor(TextColor.R, TextColor.G, TextColor.B, 0.2f),
+        X + 55, Y + 8, 1, H - 16);
+
+    // Label text (centered in remaining space)
+    Canvas->TextSize(SmallFont, Label, TW, TH);
+    float LabelX = X + 60 + (W - 60 - TW) * 0.5f;
+    Canvas->SetDrawColor(FColor(
+        (uint8)(TextColor.R * 255),
+        (uint8)(TextColor.G * 255),
+        (uint8)(TextColor.B * 255)));
+    Canvas->DrawText(SmallFont, Label, LabelX, Y + (H - TH) * 0.5f);
+}
+
+void ASBGameFlowHUD::DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness)
+{
+    // Top
+    DrawRect(Color, X, Y, W, Thickness);
+    // Bottom
+    DrawRect(Color, X, Y + H - Thickness, W, Thickness);
+    // Left
+    DrawRect(Color, X, Y, Thickness, H);
+    // Right
+    DrawRect(Color, X + W - Thickness, Y, Thickness, H);
+}
+
+void ASBGameFlowHUD::DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color)
+{
+    float T = 2.0f; // thickness
+    float Inset = 15.0f;
+
+    // Top-left corner
+    DrawRect(Color, Inset, Inset, Size, T);
+    DrawRect(Color, Inset, Inset, T, Size);
+
+    // Top-right corner
+    DrawRect(Color, SW - Inset - Size, Inset, Size, T);
+    DrawRect(Color, SW - Inset - T, Inset, T, Size);
+
+    // Bottom-left corner
+    DrawRect(Color, Inset, SH - Inset - T, Size, T);
+    DrawRect(Color, Inset, SH - Inset - Size, T, Size);
+
+    // Bottom-right corner
+    DrawRect(Color, SW - Inset - Size, SH - Inset - T, Size, T);
+    DrawRect(Color, SW - Inset - T, SH - Inset - Size, T, Size);
+}
+
+void ASBGameFlowHUD::DrawSeparatorLine(float X, float Y, float W, const FString& Text)
+{
+    UFont* TinyFont = GEngine->GetTinyFont();
+    float TW, TH;
+    Canvas->TextSize(TinyFont, Text, TW, TH);
+
+    float TextX = X + (W - TW) * 0.5f;
+    float LineY = Y + TH * 0.5f;
+    float Gap = 10.0f;
+
+    // Left line
+    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), X, LineY, TextX - X - Gap, 1);
+    // Right line
+    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), TextX + TW + Gap, LineY, X + W - TextX - TW - Gap, 1);
+
+    // Text
+    Canvas->SetDrawColor(FColor(120, 100, 80));
+    Canvas->DrawText(TinyFont, Text, TextX, Y);
 }
 
 // ============================================================================
@@ -538,7 +832,7 @@ void ASBGameFlowHUD::DrawLobbyScreen()
 
     if (IsMouseInRect(StartBtnX, StartBtnY, StartBtnW, StartBtnH) && WasMouseClicked())
     {
-        GoToScreen(ESBFlowScreen::InGame);
+        StartTransition(ESBFlowScreen::InGame, 1.2f);
     }
 
     // Footer

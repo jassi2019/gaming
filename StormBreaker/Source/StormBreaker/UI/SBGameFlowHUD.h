@@ -83,6 +83,16 @@ private:
     float CachedFPS;
     float FPSTimer;
 
+    // --- Smooth Transitions ---
+    bool bTransitioning;
+    ESBFlowScreen TransitionTarget;
+    float TransitionTimer;
+    float TransitionDuration;
+    bool bTransitionFadingOut; // true = fading to black, false = fading in
+
+    void StartTransition(ESBFlowScreen Target, float Duration = 0.8f);
+    void DrawTransitionOverlay();
+
     // Login state
     bool bLoggedIn;
 
@@ -92,4 +102,12 @@ private:
 
     // Track mouse
     bool bMouseWasPressed;
+
+    // --- Login Screen Helpers ---
+    void DrawLoginButton(float X, float Y, float W, float H,
+        const FString& IconText, const FString& Label,
+        FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor);
+    void DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness = 2.0f);
+    void DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color);
+    void DrawSeparatorLine(float X, float Y, float W, const FString& Text);
 };

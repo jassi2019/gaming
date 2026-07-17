@@ -41,7 +41,7 @@ public:
     void GoToScreen(ESBFlowScreen Screen);
 
     UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Flow")
-    float SplashDuration = 5.0f;
+    float SplashDuration = 10.0f;
 
     // --- Splash Video ---
 

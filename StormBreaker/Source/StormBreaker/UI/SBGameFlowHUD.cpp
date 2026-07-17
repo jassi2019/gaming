@@ -25,7 +25,8 @@
 
 ASBGameFlowHUD::ASBGameFlowHUD()
 {
-    CurrentScreen = ESBFlowScreen::Splash;
+    // Skip canvas splash — startup videos handle it now
+    CurrentScreen = ESBFlowScreen::Login;
     ScreenTimer = 0.0f;
     CachedFPS = 60.0f;
     FPSTimer = 0.0f;

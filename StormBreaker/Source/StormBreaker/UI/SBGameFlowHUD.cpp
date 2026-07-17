@@ -211,54 +211,134 @@ void ASBGameFlowHUD::DrawSplashScreen()
 {
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
-
-    // Try video first
-    if (bSplashVideoPlaying)
-    {
-        DrawRect(FLinearColor::Black, 0, 0, SW, SH);
-        DrawSplashVideo();
-        return;
-    }
-
-    // Fallback: canvas-drawn splash
-    // Black background
-    DrawRect(FLinearColor::Black, 0, 0, SW, SH);
+    const float T = ScreenTimer;
+    const float Duration = SplashDuration;
 
     UFont* LargeFont = GEngine->GetLargeFont();
+    UFont* MedFont = GEngine->GetMediumFont();
     UFont* SmallFont = GEngine->GetSmallFont();
-
-    // Game title
-    FString Title = TEXT("ISLAND OF DEATH");
+    UFont* TinyFont = GEngine->GetTinyFont();
     float TW, TH;
-    Canvas->TextSize(LargeFont, Title, TW, TH);
-    Canvas->SetDrawColor(FColor(255, 200, 50));
-    Canvas->DrawText(LargeFont, Title, (SW - TW) * 0.5f, SH * 0.35f);
 
-    // Subtitle
-    FString Sub = TEXT("BATTLE ROYALE");
-    Canvas->TextSize(SmallFont, Sub, TW, TH);
-    Canvas->SetDrawColor(FColor(200, 200, 200));
-    Canvas->DrawText(SmallFont, Sub, (SW - TW) * 0.5f, SH * 0.35f + 50.0f);
+    // === PHASE 1: Dark background with subtle blue gradient ===
+    DrawRect(FLinearColor(0.01f, 0.015f, 0.03f), 0, 0, SW, SH);
 
-    // Loading bar
-    float BarW = SW * 0.3f;
-    float BarH = 8.0f;
+    // Subtle diagonal light streaks (storm feel)
+    float StreakAlpha = 0.03f;
+    for (int32 i = 0; i < 5; i++)
+    {
+        float X = SW * (0.1f + i * 0.2f) + FMath::Sin(T * 0.5f + i) * 30.0f;
+        DrawRect(FLinearColor(0.3f, 0.5f, 0.8f, StreakAlpha), X, 0, 3, SH);
+    }
+
+    // Vignette — dark edges
+    float VigSize = SW * 0.15f;
+    DrawRect(FLinearColor(0, 0, 0, 0.6f), 0, 0, VigSize, SH);
+    DrawRect(FLinearColor(0, 0, 0, 0.6f), SW - VigSize, 0, VigSize, SH);
+    DrawRect(FLinearColor(0, 0, 0, 0.5f), 0, 0, SW, VigSize * 0.5f);
+    DrawRect(FLinearColor(0, 0, 0, 0.5f), 0, SH - VigSize * 0.5f, SW, VigSize * 0.5f);
+
+    // === PHASE 2: Lightning flashes ===
+    bool bFlash1 = (T > 2.0f && T < 2.15f);
+    bool bFlash2 = (T > 4.5f && T < 4.6f);
+    if (bFlash1 || bFlash2)
+    {
+        float FlashAlpha = bFlash1 ? (1.0f - (T - 2.0f) / 0.15f) : (1.0f - (T - 4.5f) / 0.1f);
+        DrawRect(FLinearColor(0.4f, 0.5f, 0.8f, FlashAlpha * 0.3f), 0, 0, SW, SH);
+    }
+
+    // === PHASE 3: Title fade-in (starts at 1.5s, full at 3.5s) ===
+    float TitleAlpha = FMath::Clamp((T - 1.5f) / 2.0f, 0.0f, 1.0f);
+    if (TitleAlpha > 0.0f)
+    {
+        FString Title = TEXT("ISLAND OF DEATH");
+        Canvas->TextSize(LargeFont, Title, TW, TH);
+        float TitleX = (SW - TW) * 0.5f;
+        float TitleY = SH * 0.38f;
+
+        // Glow behind title
+        float GlowPulse = 0.5f + 0.5f * FMath::Sin(T * 3.0f);
+        float GlowAlpha = TitleAlpha * 0.15f * GlowPulse;
+        DrawRect(FLinearColor(0.3f, 0.5f, 1.0f, GlowAlpha),
+            TitleX - 30, TitleY - 10, TW + 60, TH + 20);
+
+        // Title text — metallic silver-blue
+        uint8 R = (uint8)(FMath::Lerp(180.0f, 220.0f, GlowPulse) * TitleAlpha);
+        uint8 G = (uint8)(FMath::Lerp(190.0f, 230.0f, GlowPulse) * TitleAlpha);
+        uint8 B = (uint8)(FMath::Lerp(210.0f, 255.0f, GlowPulse) * TitleAlpha);
+        Canvas->SetDrawColor(FColor(R, G, B, (uint8)(255 * TitleAlpha)));
+        Canvas->DrawText(LargeFont, Title, TitleX, TitleY);
+    }
+
+    // === PHASE 4: Accent line (draws from center at 3s) ===
+    float LineProgress = FMath::Clamp((T - 3.0f) / 1.0f, 0.0f, 1.0f);
+    if (LineProgress > 0.0f)
+    {
+        float LineW = SW * 0.2f * LineProgress;
+        float LineY = SH * 0.48f;
+        float LineX = (SW - LineW) * 0.5f;
+
+        // Glow
+        DrawRect(FLinearColor(0.1f, 0.3f, 0.8f, 0.2f * LineProgress),
+            LineX - 5, LineY - 3, LineW + 10, 8);
+        // Main line
+        DrawRect(FLinearColor(0.2f, 0.5f, 1.0f, LineProgress),
+            LineX, LineY, LineW, 2);
+    }
+
+    // === PHASE 5: Tagline fade-in (starts at 4s) ===
+    float TagAlpha = FMath::Clamp((T - 4.0f) / 1.5f, 0.0f, 1.0f);
+    if (TagAlpha > 0.0f)
+    {
+        FString Sub = TEXT("BATTLE ROYALE");
+        Canvas->TextSize(SmallFont, Sub, TW, TH);
+        Canvas->SetDrawColor(FColor(160, 170, 190, (uint8)(200 * TagAlpha)));
+        Canvas->DrawText(SmallFont, Sub, (SW - TW) * 0.5f, SH * 0.52f);
+    }
+
+    // === PHASE 6: Bottom info (fades in at 5s) ===
+    float BottomAlpha = FMath::Clamp((T - 5.0f) / 1.0f, 0.0f, 1.0f);
+    if (BottomAlpha > 0.0f)
+    {
+        // Engine version
+        Canvas->SetDrawColor(FColor(60, 70, 90, (uint8)(120 * BottomAlpha)));
+        Canvas->DrawText(TinyFont, TEXT("Unreal Engine 5.8"), SW - 180, SH - 30);
+
+        // Studio name
+        Canvas->DrawText(TinyFont, TEXT("StormBreaker Games"), 20, SH - 30);
+    }
+
+    // === PHASE 7: Loading bar (starts at 2s) ===
+    float BarProgress = FMath::Clamp((T - 2.0f) / (Duration - 3.0f), 0.0f, 1.0f);
+    float BarW = SW * 0.25f;
+    float BarH = 4.0f;
     float BarX = (SW - BarW) * 0.5f;
-    float BarY = SH * 0.65f;
-    float Progress = FMath::Clamp(ScreenTimer / SplashDuration, 0.0f, 1.0f);
+    float BarY = SH * 0.62f;
 
-    DrawBar(BarX, BarY, BarW, BarH, Progress,
-        FLinearColor(1.0f, 0.8f, 0.2f), FLinearColor(0.15f, 0.15f, 0.15f));
+    DrawBar(BarX, BarY, BarW, BarH, BarProgress,
+        FLinearColor(0.2f, 0.5f, 1.0f, 0.8f), FLinearColor(0.1f, 0.1f, 0.15f, 0.5f));
 
     // Loading text
-    FString LoadText = TEXT("LOADING...");
-    Canvas->TextSize(SmallFont, LoadText, TW, TH);
-    Canvas->SetDrawColor(FColor(150, 150, 150));
-    Canvas->DrawText(SmallFont, LoadText, (SW - TW) * 0.5f, BarY + 20.0f);
+    float LoadAlpha2 = FMath::Clamp((T - 2.0f) / 1.0f, 0.0f, 1.0f);
+    FString LoadStr = TEXT("LOADING...");
+    Canvas->TextSize(TinyFont, LoadStr, TW, TH);
+    Canvas->SetDrawColor(FColor(120, 130, 150, (uint8)(180 * LoadAlpha2)));
+    Canvas->DrawText(TinyFont, LoadStr, (SW - TW) * 0.5f, BarY + 12.0f);
 
-    // Version
-    Canvas->SetDrawColor(FColor(80, 80, 80));
-    Canvas->DrawText(SmallFont, TEXT("v1.0.0 | UE 5.8"), 20.0f, SH - 30.0f);
+    // === FADE: Black at start and end ===
+    // Fade from black (0-1s)
+    if (T < 1.0f)
+    {
+        float FadeAlpha = 1.0f - T;
+        DrawRect(FLinearColor(0, 0, 0, FadeAlpha), 0, 0, SW, SH);
+    }
+
+    // Fade to black (last 1.5s)
+    if (T > Duration - 1.5f)
+    {
+        float FadeAlpha = (T - (Duration - 1.5f)) / 1.5f;
+        DrawRect(FLinearColor(0, 0, 0, FadeAlpha), 0, 0, SW, SH);
+    }
 }
 
 // ============================================================================

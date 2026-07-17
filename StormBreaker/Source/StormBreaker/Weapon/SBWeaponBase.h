@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -36,33 +36,33 @@ public:
 
     // --- Initialization ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void InitializeWeapon(USBWeaponDataAsset* InData);
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Weapon")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Weapon")
     TObjectPtr<USBWeaponDataAsset> WeaponData;
 
     // --- State ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ESBWeaponState GetWeaponState() const { return WeaponState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ESBFireMode GetCurrentFireMode() const { return CurrentFireMode; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     int32 GetCurrentMagazine() const { return CurrentMagazineAmmo; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     int32 GetCurrentReserve() const { return CurrentReserveAmmo; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     bool CanFire() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     bool CanReload() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     float GetCurrentSpread() const;
 
     // --- Actions ---
@@ -80,19 +80,19 @@ public:
     void SetAmmo(int32 MagAmmo, int32 ReserveAmmo);
 
     // Attachments
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void ApplyAttachment(const FSBAttachmentModifier& Attachment);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void RemoveAttachment(const FName& AttachmentName);
 
     // Owner
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ASBCharacterBase* GetOwningCharacter() const { return OwningCharacter; }
 
     // --- Components ---
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Weapon")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Weapon")
     TObjectPtr<USkeletalMeshComponent> WeaponMeshComp;
 
     // --- Delegates ---

@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -39,13 +39,13 @@ public:
 
     // ----- Stats -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Stats")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Stats")
     int32 GetKills() const { return Kills; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Stats")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Stats")
     int32 GetAssists() const { return Assists; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Stats")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Stats")
     int32 GetDamageDealt() const { return DamageDealt; }
 
     void AddKill();
@@ -54,24 +54,24 @@ public:
 
     // ----- Status -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Status")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Status")
     ESBPlayerStatus GetPlayerStatus() const { return PlayerStatus; }
 
     void SetPlayerStatus(ESBPlayerStatus NewStatus);
 
     // ----- Team -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Team")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Team")
     int32 GetTeamId() const { return TeamId; }
 
     void SetTeamId(int32 InTeamId);
 
     // ----- GAS -----
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Abilities")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Abilities")
     TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Abilities")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Abilities")
     TObjectPtr<USBAttributeSet> AttributeSet;
 
 protected:

@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -25,24 +25,24 @@ public:
 
     // --- Validation ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|AntiCheat")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|AntiCheat")
     int32 GetViolationCount() const { return ViolationCount; }
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AntiCheat")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AntiCheat")
     float MaxAllowedSpeed = 1200.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AntiCheat")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AntiCheat")
     float TeleportThreshold = 2000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AntiCheat")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AntiCheat")
     float SpeedCheckInterval = 0.5f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AntiCheat")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AntiCheat")
     int32 MaxViolationsBeforeKick = 10;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AntiCheat")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AntiCheat")
     float ViolationDecayRate = 1.0f;
 
     // --- Delegate ---

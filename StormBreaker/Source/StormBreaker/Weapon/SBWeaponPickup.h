@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -38,7 +38,7 @@ public:
 
     // --- Data ---
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "StormBreaker|Pickup")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "IslandOfDeath|Pickup")
     TObjectPtr<USBWeaponDataAsset> WeaponData;
 
     UPROPERTY(Replicated)
@@ -49,7 +49,7 @@ public:
 
     // --- Interaction ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Pickup")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Pickup")
     void Interact(APawn* InteractingPawn);
 
 protected:

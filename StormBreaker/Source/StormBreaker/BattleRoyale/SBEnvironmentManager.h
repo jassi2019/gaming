@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -41,33 +41,33 @@ public:
 
     // --- Time ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Environment")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Environment")
     void SetTimeOfDay(float NormalizedTime);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Environment")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Environment")
     float GetTimeOfDay() const { return CurrentTime; }
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Environment")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Environment")
     float DayLengthMinutes = 20.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Environment")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Environment")
     float StartTime = 0.35f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Environment")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Environment")
     bool bCycleEnabled = true;
 
     // --- Weather ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Environment")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Environment")
     void SetWeather(ESBWeatherState NewWeather);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Environment")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Environment")
     ESBWeatherState GetWeather() const { return WeatherState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Environment")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Environment")
     float GetWindStrength() const;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Environment")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Environment")
     float WeatherChangeIntervalMin = 300.0f;
 
     // --- Components ---

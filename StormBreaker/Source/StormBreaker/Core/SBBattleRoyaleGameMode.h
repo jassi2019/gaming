@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -42,19 +42,19 @@ public:
 
     // ----- Match Flow -----
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Match")
     void SetMatchPhase(ESBMatchPhase NewPhase);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Match")
     ESBMatchPhase GetMatchPhase() const { return CurrentPhase; }
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Match")
     void StartPlanePhase();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Match")
     void TriggerZoneShrink();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Match")
     void SpawnAirDrop(FVector Location);
 
     UPROPERTY(BlueprintAssignable)
@@ -62,28 +62,28 @@ public:
 
     // ----- Config -----
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     int32 MaxPlayersPerMatch = 100;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     int32 MinPlayersToStart = 2;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     float WarmUpDuration = 60.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     int32 TeamSize = 4;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     int32 NumberOfBots = 0;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     bool bAutoSpawnArena = true;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     bool bAutoStartZone = true;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Match")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Match")
     float ZoneStartDelay = 10.0f;
 
     // --- Starter Weapon (auto-created for testing) ---

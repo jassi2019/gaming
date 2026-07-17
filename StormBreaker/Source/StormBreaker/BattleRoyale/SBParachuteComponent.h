@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -38,53 +38,53 @@ public:
 
     // --- Control ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Parachute")
     void BeginFreeFall();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Parachute")
     void DeployParachute();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Parachute")
     void SetSteeringInput(FVector2D Input);
 
     // --- Queries ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Parachute")
     ESBParachuteState GetState() const { return ParachuteState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Parachute")
     bool IsParachuteActive() const { return ParachuteState == ESBParachuteState::FreeFall || ParachuteState == ESBParachuteState::Deployed; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Parachute")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Parachute")
     float GetAltitudeAboveGround() const;
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float FreeFallSpeed = 5000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float FreeFallForwardSpeed = 3000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float ParachuteDescendSpeed = 800.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float ParachuteForwardSpeed = 1500.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float SteeringSpeed = 120.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float AutoDeployAltitude = 500.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float LandingAltitude = 50.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     float WindStrength = 200.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Parachute")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Parachute")
     TObjectPtr<UStaticMesh> ParachuteMesh;
 
     // --- Delegates ---

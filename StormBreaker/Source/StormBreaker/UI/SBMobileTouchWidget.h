@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -32,82 +32,82 @@ class STORMBREAKER_API USBMobileTouchWidget : public UUserWidget
 public:
     // --- Joystick Output (polled by character each frame) ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Mobile")
     FVector2D GetMoveInput() const { return MoveInput; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Mobile")
     FVector2D GetLookInput() const { return LookInput; }
 
     // --- Action Delegates ---
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileFirePressed OnFirePressed;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileFireReleased OnFireReleased;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileADSPressed OnADSPressed;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileADSReleased OnADSReleased;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileReloadPressed OnReloadPressed;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Mobile")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Mobile")
     FOnMobileInteractPressed OnInteractPressed;
 
     // --- Joystick Config ---
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StormBreaker|Mobile")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IslandOfDeath|Mobile")
     float JoystickDeadzone = 0.15f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StormBreaker|Mobile")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IslandOfDeath|Mobile")
     float JoystickRadius = 100.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StormBreaker|Mobile")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IslandOfDeath|Mobile")
     float LookSensitivity = 0.5f;
 
     // --- Called by Blueprint widget buttons ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void SetMoveInput(FVector2D Input);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void SetLookInput(FVector2D Input);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnJumpPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnCrouchPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnPronePressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnSprintPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnSprintReleased();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnFireButtonPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnFireButtonReleased();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnADSButtonPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnADSButtonReleased();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnReloadButtonPressed();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Mobile")
     void OnInteractButtonPressed();
 
 protected:

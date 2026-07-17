@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -25,36 +25,36 @@ public:
 
     // --- Spawning ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Bots")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Bots")
     void SpawnBots(int32 Count, TSubclassOf<ASBCharacterBase> PawnClass);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Bots")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Bots")
     void DespawnAllBots();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Bots")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Bots")
     int32 GetAliveBotCount() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Bots")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Bots")
     int32 GetTotalBotCount() const { return SpawnedBots.Num(); }
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float EasyPercent = 0.40f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float NormalPercent = 0.35f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float HardPercent = 0.20f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float ProPercent = 0.05f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float SpawnRadius = 30000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bots")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bots")
     float SpawnHeight = 200.0f;
 
 private:

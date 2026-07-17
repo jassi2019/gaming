@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -35,58 +35,58 @@ public:
 
     // --- State ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     ESBPlayerLifeState GetLifeState() const { return LifeState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     bool IsAlive() const { return LifeState == ESBPlayerLifeState::Alive; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     bool IsKnocked() const { return LifeState == ESBPlayerLifeState::Knocked; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     bool IsDead() const { return LifeState == ESBPlayerLifeState::Dead; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     float GetBleedOutTimeRemaining() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|LifeState")
     float GetReviveProgress() const;
 
     // --- Actions ---
 
     void HandleHealthReachedZero(AController* Killer);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|LifeState")
     void StartRevive(ASBCharacterBase* Reviver);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|LifeState")
     void CancelRevive();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|LifeState")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|LifeState")
     void ForceKill(AController* Killer);
 
     void EnterSpectatorMode();
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     float BleedOutDuration = 90.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     float ReviveDuration = 10.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     float KnockedMoveSpeed = 50.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     float HealthAfterRevive = 30.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     TSubclassOf<ASBDeathCrate> DeathCrateClass;
 
     // If false, knocked players die instantly (solo mode)
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|LifeState")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|LifeState")
     bool bEnableKnockSystem = true;
 
     // --- Delegates ---

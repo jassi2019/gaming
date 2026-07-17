@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -21,21 +21,21 @@ class STORMBREAKER_API ASBLootSpawnPoint : public AActor
 public:
     ASBLootSpawnPoint();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Loot")
     void SpawnLoot();
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Loot")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Loot")
     TObjectPtr<UDataTable> LootTable;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Loot")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Loot")
     int32 MinItems = 1;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Loot")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Loot")
     int32 MaxItems = 3;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Loot")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Loot")
     FName BuildingTag;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Loot")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Loot")
     bool bHasSpawned = false;
 };

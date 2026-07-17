@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -28,37 +28,37 @@ public:
 
     // ----- Input Contexts -----
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     int32 DefaultMappingPriority = 0;
 
     // ----- Mobile -----
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Mobile")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Mobile")
     TSubclassOf<USBMobileTouchWidget> MobileTouchWidgetClass;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Mobile")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Mobile")
     USBMobileTouchWidget* GetMobileTouchWidget() const { return MobileTouchWidget; }
 
     // ----- HUD -----
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void ShowMatchHUD();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void ShowInventoryUI();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void HideInventoryUI();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void ShowMapUI();
 
     // ----- Spectating -----
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Spectator")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Spectator")
     void StartSpectating();
 
     UFUNCTION(Server, Reliable)

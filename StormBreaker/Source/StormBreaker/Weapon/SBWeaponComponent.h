@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -33,72 +33,72 @@ public:
 
     // --- Weapon Management ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     bool AddWeapon(USBWeaponDataAsset* WeaponData, ESBWeaponSlot Slot);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     bool AddWeaponToSlot(USBWeaponDataAsset* WeaponData, int32 SlotIndex);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void RemoveWeapon(ESBWeaponSlot Slot);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void DropCurrentWeapon();
 
     // --- Switching ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void SwitchToSlot(ESBWeaponSlot Slot);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void SwitchToNextWeapon();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void SwitchToPreviousWeapon();
 
     // --- Actions (forwarded to active weapon) ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void StartFire();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void StopFire();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void Reload();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void CycleFireMode();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void Inspect();
 
     // --- Queries ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ASBWeaponBase* GetActiveWeapon() const { return ActiveWeapon; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ASBWeaponBase* GetWeaponInSlot(ESBWeaponSlot Slot) const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     ESBWeaponSlot GetActiveSlot() const { return ActiveSlot; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     bool HasWeaponInSlot(ESBWeaponSlot Slot) const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Weapon")
     int32 GetAmmoForType(ESBAmmoType AmmoType) const;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Weapon")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Weapon")
     void AddAmmoForType(ESBAmmoType AmmoType, int32 Amount);
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Weapon")
     FName WeaponAttachSocket = FName("weapon_r");
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Weapon")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Weapon")
     FName BackpackSocket = FName("spine_03");
 
     // --- Delegates ---

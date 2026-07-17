@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -27,85 +27,85 @@ public:
 
     // --- Auth ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void Login(ESBAuthProvider Provider);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void Logout();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     ESBAuthState GetAuthState() const { return AuthState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     bool IsAuthenticated() const { return AuthState == ESBAuthState::Authenticated; }
 
     // --- Profile ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     const FSBPlayerProfile& GetProfile() const { return Profile; }
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void SetUsername(const FString& NewName);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void AddXP(int32 Amount);
 
     // --- Match Results ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void SubmitMatchResult(const FSBMatchResult& Result);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     const TArray<FSBMatchResult>& GetMatchHistory() const { return CloudData.MatchHistory; }
 
     // --- Cloud Save ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void SaveToCloud();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void LoadFromCloud();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void SaveToLocal();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void LoadFromLocal();
 
     // --- Battle Pass ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     const FSBBattlePassState& GetBattlePass() const { return CloudData.BattlePass; }
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void AddBattlePassXP(int32 Amount);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void ClaimBattlePassReward(int32 Tier);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void UpdateMissionProgress(const FName& MissionID, int32 Delta);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void ClaimMission(const FName& MissionID);
 
     // --- Store ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     bool PurchaseItem(const FSBStoreItem& Item);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     bool OwnsItem(const FName& ItemID) const;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void AddCurrency(ESBCurrencyType Type, int32 Amount);
 
     // --- Ranking ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Backend")
     void UpdateRankPoints(int32 Delta);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Backend")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Backend")
     ESBRankTier CalculateRankTier(int32 Points) const;
 
     // --- Delegates ---

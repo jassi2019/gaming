@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -78,25 +78,25 @@ public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     virtual void Deinitialize() override;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Settings")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Settings")
     void SaveSettings();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Settings")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Settings")
     void LoadSettings();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Settings")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Settings")
     void ApplyGraphicsSettings();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Settings")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Settings")
     void ApplyAudioSettings();
 
-    UPROPERTY(BlueprintReadWrite, Category = "StormBreaker|Settings")
+    UPROPERTY(BlueprintReadWrite, Category = "IslandOfDeath|Settings")
     FSBGraphicsSettings Graphics;
 
-    UPROPERTY(BlueprintReadWrite, Category = "StormBreaker|Settings")
+    UPROPERTY(BlueprintReadWrite, Category = "IslandOfDeath|Settings")
     FSBAudioSettings Audio;
 
-    UPROPERTY(BlueprintReadWrite, Category = "StormBreaker|Settings")
+    UPROPERTY(BlueprintReadWrite, Category = "IslandOfDeath|Settings")
     FSBControlSettings Controls;
 
 private:

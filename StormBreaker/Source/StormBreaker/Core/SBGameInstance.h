@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -25,26 +25,26 @@ public:
     // ----- Online Session -----
 
     /** Create or find a match and travel to it. */
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Online")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Online")
     void HostSession(int32 MaxPlayers, bool bIsDedicatedServer);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Online")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Online")
     void FindAndJoinSession();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Online")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Online")
     void DestroyCurrentSession();
 
     // ----- Player Identity -----
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Player")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Player")
     FString GetLocalPlayerDisplayName() const;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Player")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Player")
     void SetLocalPlayerDisplayName(const FString& InName);
 
     // ----- Quality Settings -----
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Settings")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Settings")
     void ApplyQualityPreset(int32 PresetIndex);
 
 protected:

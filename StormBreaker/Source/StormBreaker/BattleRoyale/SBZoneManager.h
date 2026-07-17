@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -49,47 +49,47 @@ public:
 
     // --- Control ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Zone")
     void InitZone(const FVector& MapCenter, float InitialRadius);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Zone")
     void StartNextPhase();
 
     // --- Queries ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     FVector GetCurrentCenter() const { return CurrentCenter; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     float GetCurrentRadius() const { return CurrentRadius; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     FVector GetTargetCenter() const { return TargetCenter; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     float GetTargetRadius() const { return TargetRadius; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     int32 GetCurrentPhase() const { return CurrentPhaseIndex; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     bool IsShrinking() const { return bIsShrinking; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     float GetTimeUntilShrink() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     float GetShrinkProgress() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     bool IsLocationInSafeZone(const FVector& Location) const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     float GetCurrentDPS() const;
 
     // --- Phase Table ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Zone")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Zone")
     TArray<FSBZonePhase> Phases;
 
     // --- Delegates ---

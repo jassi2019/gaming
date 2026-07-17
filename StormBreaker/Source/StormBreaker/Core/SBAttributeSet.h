@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -32,41 +32,41 @@ public:
 
     // ----- Health -----
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData Health;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, Health)
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData MaxHealth;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, MaxHealth)
 
     // ----- Shield (Armor) -----
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Shield, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Shield, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData Shield;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, Shield)
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxShield, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxShield, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData MaxShield;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, MaxShield)
 
     // ----- Stamina -----
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Stamina, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Stamina, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData Stamina;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, Stamina)
 
-    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxStamina, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxStamina, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData MaxStamina;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, MaxStamina)
 
     // ----- Meta Attribute (damage pipeline) -----
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData IncomingDamage;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, IncomingDamage)
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Attributes")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Attributes")
     FGameplayAttributeData IncomingHealing;
     ATTRIBUTE_ACCESSORS(USBAttributeSet, IncomingHealing)
 

@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #include "UI/SBGameFlowHUD.h"
 #include "MediaPlayer.h"
@@ -290,7 +290,7 @@ void ASBGameFlowHUD::DrawSplashScreen()
     float TagAlpha = FMath::Clamp((T - 4.0f) / 1.5f, 0.0f, 1.0f);
     if (TagAlpha > 0.0f)
     {
-        FString Sub = TEXT("BATTLE ROYALE");
+        FString Sub = TEXT("Some Spirits Don't Seek Revenge... They Seek Survival");
         Canvas->TextSize(SmallFont, Sub, TW, TH);
         Canvas->SetDrawColor(FColor(160, 170, 190, (uint8)(200 * TagAlpha)));
         Canvas->DrawText(SmallFont, Sub, (SW - TW) * 0.5f, SH * 0.52f);
@@ -305,7 +305,7 @@ void ASBGameFlowHUD::DrawSplashScreen()
         Canvas->DrawText(TinyFont, TEXT("Unreal Engine 5.8"), SW - 180, SH - 30);
 
         // Studio name
-        Canvas->DrawText(TinyFont, TEXT("StormBreaker Games"), 20, SH - 30);
+        Canvas->DrawText(TinyFont, TEXT("Island Of Death Games"), 20, SH - 30);
     }
 
     // === PHASE 7: Loading bar (starts at 2s) ===
@@ -415,7 +415,7 @@ void ASBGameFlowHUD::DrawLoginScreen()
 
     // Footer
     Canvas->SetDrawColor(FColor(60, 60, 60));
-    Canvas->DrawText(SmallFont, TEXT("StormBreaker Games | All Rights Reserved"), 20.0f, SH - 30.0f);
+    Canvas->DrawText(SmallFont, TEXT("Island Of Death Games | All Rights Reserved"), 20.0f, SH - 30.0f);
 }
 
 // ============================================================================
@@ -466,7 +466,7 @@ void ASBGameFlowHUD::DrawLobbyScreen()
     Canvas->DrawText(SmallFont, CoinStr, SW - TW - 20.0f, 20.0f);
 
     // Center: Game Mode
-    FString ModeText = TEXT("BATTLE ROYALE - TPP");
+    FString ModeText = TEXT("ISLAND OF DEATH - TPP");
     Canvas->TextSize(MedFont, ModeText, TW, TH);
     Canvas->SetDrawColor(FColor::White);
     Canvas->DrawText(MedFont, ModeText, (SW - TW) * 0.5f, SH * 0.15f);

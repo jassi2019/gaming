@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #include "Multiplayer/SBMultiplayerSubsystem.h"
 #include "StormBreaker.h"

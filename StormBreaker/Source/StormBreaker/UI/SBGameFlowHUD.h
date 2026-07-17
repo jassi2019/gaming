@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -40,7 +40,7 @@ public:
     // Transition to next screen
     void GoToScreen(ESBFlowScreen Screen);
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Flow")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Flow")
     float SplashDuration = 10.0f;
 
     // --- Splash Video ---

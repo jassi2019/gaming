@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #include "Core/SBBattleRoyaleGameMode.h"
 #include "Core/SBBattleRoyaleGameState.h"
@@ -36,7 +36,7 @@ ASBBattleRoyaleGameMode::ASBBattleRoyaleGameMode()
 
     // Match doesn't auto-start — lobby screen handles it
     MinPlayersToStart = 100;
-    NumberOfBots = 5;
+    NumberOfBots = 2;
 }
 
 void ASBBattleRoyaleGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)

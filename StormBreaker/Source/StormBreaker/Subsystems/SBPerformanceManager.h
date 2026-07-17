@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -42,61 +42,61 @@ public:
 
     // --- Quality ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetQualityTier(ESBQualityTier Tier);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetFPSTarget(ESBFPSTarget Target);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Performance")
     ESBQualityTier GetCurrentTier() const { return CurrentTier; }
 
     // --- Dynamic Resolution ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetDynamicResolution(bool bEnabled, float MinScale = 0.6f, float MaxScale = 1.0f);
 
     // --- Tick Budgeting ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetAITickBudgetMs(float BudgetMs);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetAnimationBudgetMs(float BudgetMs);
 
     // --- Memory ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void SetTexturePoolSizeMB(int32 SizeMB);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Performance")
     void TriggerStreamingFlush();
 
     // --- Stats ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Performance")
     float GetCurrentFPS() const { return CachedFPS; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Performance")
     float GetCurrentResolutionScale() const;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Performance")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Performance")
     int32 GetUsedMemoryMB() const;
 
     // --- Auto Adapt ---
 
     void TickAutoAdapt(float DeltaTime);
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Performance")
     bool bAutoAdaptQuality = true;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Performance")
     float AdaptCheckInterval = 5.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Performance")
     float DowngradeThresholdFPS = 28.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Performance")
     float UpgradeThresholdFPS = 55.0f;
 
 private:

@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -33,25 +33,25 @@ public:
 
     // --- Map Config ---
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
-    float MapRadius = 30000.0f;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
+    float MapRadius = 10000.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
-    int32 NumPlayerStarts = 4;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
+    int32 NumPlayerStarts = 2;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
-    int32 NumCoverStructures = 40;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
+    int32 NumCoverStructures = 10;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
-    float CoverSpreadRadius = 20000.0f;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
+    float CoverSpreadRadius = 8000.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
     bool bSpawnZoneManager = true;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
     bool bSpawnNavMesh = true;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Map")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Map")
     bool bSpawnGround = true;
 
 private:

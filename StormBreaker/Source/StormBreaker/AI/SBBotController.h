@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -33,35 +33,35 @@ public:
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bot")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bot")
     ESBBotDifficulty Difficulty = ESBBotDifficulty::Normal;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Bot")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Bot")
     FSBBotDifficultySettings DifficultySettings;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Bot")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Bot")
     ESBBotState CurrentState;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Bot")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Bot")
     FSBBotMemory Memory;
 
     // --- Perception ---
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Bot")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Bot")
     TObjectPtr<UAIPerceptionComponent> PerceptionComp;
 
     // --- AI LOD ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bot|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bot|Performance")
     float FullTickDistance = 5000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bot|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bot|Performance")
     float ReducedTickDistance = 15000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bot|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bot|Performance")
     float MinTickInterval = 0.05f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Bot|Performance")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Bot|Performance")
     float MaxTickInterval = 0.5f;
 
 private:

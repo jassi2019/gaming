@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -47,7 +47,7 @@ public:
 
     // ----- Zone -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Zone")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Zone")
     FSBZoneData GetZoneData() const { return ZoneData; }
 
     void BeginZoneShrink();
@@ -55,19 +55,19 @@ public:
 
     // ----- Match State -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Match")
     ESBMatchPhase GetMatchPhase() const { return MatchPhase; }
 
     void SetMatchPhase(ESBMatchPhase NewPhase);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Match")
     int32 GetAlivePlayerCount() const { return AlivePlayerCount; }
 
     void SetAlivePlayerCount(int32 Count);
 
     // ----- Match Timer -----
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Match")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Match")
     float GetMatchElapsedTime() const;
 
 protected:

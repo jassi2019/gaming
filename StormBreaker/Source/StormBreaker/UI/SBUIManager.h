@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -35,29 +35,29 @@ class STORMBREAKER_API USBUIManager : public UGameInstanceSubsystem
 public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void ShowScreen(ESBUIScreen Screen);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|UI")
     void HideCurrentScreen();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|UI")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|UI")
     ESBUIScreen GetCurrentScreen() const { return CurrentScreen; }
 
     // Widget class overrides — set in Blueprint or C++ to customize
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|UI")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|UI")
     TSubclassOf<UUserWidget> MainMenuWidgetClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|UI")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|UI")
     TSubclassOf<UUserWidget> LobbyWidgetClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|UI")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|UI")
     TSubclassOf<UUserWidget> SettingsWidgetClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|UI")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|UI")
     TSubclassOf<UUserWidget> DeathScreenWidgetClass;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|UI")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|UI")
     TSubclassOf<UUserWidget> MatchEndWidgetClass;
 
 private:

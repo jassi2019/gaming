@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -25,87 +25,87 @@ public:
 
     // --- Locomotion ---
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float Speed;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float Direction;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float AimPitch;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float AimYaw;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     FVector Velocity;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     FVector Acceleration;
 
     // --- Movement State ---
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsMoving : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsInAir : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsFalling : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsSprinting : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsCrouching : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsProning : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsAiming : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsMantling : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsVaulting : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsSwimming : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsOnGround : 1;
 
     // --- Lean ---
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float LeanAmount;
 
     // --- Weapon ---
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bHasWeapon : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsFiring : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsReloading : 1;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     uint8 bIsEquipping : 1;
 
     // --- Foot IK ---
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float LeftFootIKOffset;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float RightFootIKOffset;
 
-    UPROPERTY(BlueprintReadOnly, Category = "StormBreaker|Animation")
+    UPROPERTY(BlueprintReadOnly, Category = "IslandOfDeath|Animation")
     float HipOffset;
 
 private:

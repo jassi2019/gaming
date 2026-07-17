@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -36,21 +36,21 @@ public:
 
     // --- Setup ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|AirDrop")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|AirDrop")
     void InitAirDrop(const TArray<FSBLootDrop>& InLoot, const FVector& DropLocation);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|AirDrop")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|AirDrop")
     void BeginDrop();
 
     // --- Loot ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|AirDrop")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|AirDrop")
     bool TakeItem(APawn* Looter, int32 ItemIndex);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|AirDrop")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|AirDrop")
     const TArray<FSBLootDrop>& GetLoot() const { return Loot; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|AirDrop")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|AirDrop")
     ESBAirDropState GetDropState() const { return DropState; }
 
     // --- Components ---
@@ -63,13 +63,13 @@ public:
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AirDrop")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AirDrop")
     float DropSpeed = 500.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AirDrop")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AirDrop")
     float DropAltitude = 15000.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|AirDrop")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|AirDrop")
     TObjectPtr<UNiagaraSystem> SmokeTrailVFX;
 
 protected:

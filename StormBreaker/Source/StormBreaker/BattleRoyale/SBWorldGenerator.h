@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -78,30 +78,30 @@ public:
 
     // --- Config ---
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    float MapSizeKm = 2.0f;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
+    float MapSizeKm = 1.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 TerrainResolution = 16;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
+    int32 TerrainResolution = 8;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    float TerrainMaxHeight = 1500.0f;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
+    float TerrainMaxHeight = 800.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 TreeCount = 80;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
+    int32 TreeCount = 20;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
-    int32 RockCount = 40;
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
+    int32 RockCount = 10;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|World")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|World")
     TArray<FSBPOI> POIs;
 
     // --- Generated Data ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|World")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|World")
     const TArray<FSBPOI>& GetPOIs() const { return POIs; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|World")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|World")
     float GetMapRadius() const { return MapSizeKm * 50000.0f; }
 
 private:

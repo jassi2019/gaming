@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -49,85 +49,85 @@ public:
     virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 
     // --- Sprint ---
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Movement")
     void StartSprinting();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Movement")
     void StopSprinting();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     bool IsSprinting() const { return bWantsToSprint && IsMovingOnGround(); }
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Sprint")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Sprint")
     float SprintSpeed = 800.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Sprint")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Sprint")
     float SprintStaminaDrainPerSec = 15.0f;
 
     // --- Prone ---
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Movement")
     void StartProne();
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Movement")
     void StopProne();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     bool IsProning() const { return bIsProning; }
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Prone")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Prone")
     float ProneSpeed = 100.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Prone")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Prone")
     float ProneHalfHeight = 30.0f;
 
     // --- Mantle / Vault ---
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Movement")
     bool TryMantleOrVault();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     bool IsMantling() const { return bIsMantling; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     bool IsVaulting() const { return bIsVaulting; }
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Mantle")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Mantle")
     float MaxVaultHeight = 100.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Mantle")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Mantle")
     float MaxMantleHeight = 250.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Mantle")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Mantle")
     float MantleReachDistance = 75.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Mantle")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Mantle")
     float MantleDuration = 0.8f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Mantle")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Mantle")
     float VaultDuration = 0.4f;
 
     // --- Speed Config ---
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Speed")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Speed")
     float WalkSpeed = 250.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Speed")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Speed")
     float RunSpeed = 500.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Speed")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Speed")
     float CrouchSpeed = 200.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Speed")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Speed")
     float SwimSpeed = 300.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Movement|Speed")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Movement|Speed")
     float ADSSpeed = 200.0f;
 
     // --- ADS ---
     void SetAiming(bool bNewAiming);
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     bool IsAiming() const { return bIsAiming; }
 
     // --- Delegates ---
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Movement")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Movement")
     FOnMovementModeChangedSB OnCustomMovementChanged;
 
 protected:

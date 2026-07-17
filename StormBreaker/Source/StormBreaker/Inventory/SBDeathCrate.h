@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -27,19 +27,19 @@ public:
 
     // --- Loot Interface ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Loot")
     TArray<FSBInventoryItem> GetContents() const { return Contents; }
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Loot")
     bool TakeItem(APawn* Looter, const FName& ItemID, int32 Count = 1);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Loot")
     void TakeAll(APawn* Looter);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Loot")
     bool IsEmpty() const { return Contents.Num() == 0; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Loot")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Loot")
     FString GetPlayerName() const { return DeadPlayerName; }
 
     // --- Components ---
@@ -52,7 +52,7 @@ public:
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|DeathCrate")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|DeathCrate")
     float LifeSpan = 300.0f;
 
 protected:

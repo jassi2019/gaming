@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -22,16 +22,16 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Door")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Door")
     void ToggleDoor(AActor* Interactor);
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     TObjectPtr<UStaticMeshComponent> DoorMesh;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Door")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Door")
     float OpenAngle = 90.0f;
 
-    UPROPERTY(EditAnywhere, Category = "StormBreaker|Door")
+    UPROPERTY(EditAnywhere, Category = "IslandOfDeath|Door")
     float OpenSpeed = 4.0f;
 
 protected:

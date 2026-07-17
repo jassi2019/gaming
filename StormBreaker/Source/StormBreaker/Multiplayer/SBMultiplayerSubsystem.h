@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -74,45 +74,45 @@ public:
 
     // --- Login ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void Login();
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Multiplayer")
     ESBLoginState GetLoginState() const { return LoginState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Multiplayer")
     FString GetPlayerDisplayName() const;
 
     // --- Host ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void HostSession(int32 MaxPlayers = 100, bool bIsDedicatedServer = false, const FString& MapName = TEXT("MainMap"));
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void HostListenServer(int32 MaxPlayers = 4, const FString& MapName = TEXT("MainMap"));
 
     // --- Find & Join ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void FindSessions(int32 MaxResults = 20);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void JoinSession(int32 SearchResultIndex);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void QuickMatch();
 
     // --- Leave ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Multiplayer")
     void LeaveSession();
 
     // --- State ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Multiplayer")
     ESBSessionState GetSessionState() const { return SessionState; }
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Multiplayer")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Multiplayer")
     bool IsInSession() const { return SessionState == ESBSessionState::InSession; }
 
     // --- Delegates ---

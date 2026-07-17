@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -20,19 +20,19 @@ public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     virtual void Deinitialize() override;
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Pool")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Pool")
     AActor* Acquire(TSubclassOf<AActor> ActorClass, const FVector& Location, const FRotator& Rotation);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Pool")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Pool")
     void Release(AActor* Actor);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Pool")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Pool")
     void PreWarm(TSubclassOf<AActor> ActorClass, int32 Count);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Pool")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Pool")
     void DrainPool(TSubclassOf<AActor> ActorClass);
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Pool")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Pool")
     int32 GetPoolSize(TSubclassOf<AActor> ActorClass) const;
 
 private:

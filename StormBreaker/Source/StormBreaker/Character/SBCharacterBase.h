@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -61,113 +61,113 @@ public:
 
     // --- Components ---
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USpringArmComponent> CameraBoom;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<UCameraComponent> FollowCamera;
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     USBCharacterMovementComponent* GetSBMovement() const { return SBMovementComponent; }
 
     // --- Input Actions (set in Blueprint or C++ defaults) ---
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Move;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Look;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Jump;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Sprint;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Crouch;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Prone;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_ADS;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Interact;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Fire;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_Reload;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_WeaponSlot1;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_WeaponSlot2;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StormBreaker|Input")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IslandOfDeath|Input")
     TObjectPtr<UInputAction> IA_WeaponSlot3;
 
     // --- Weapon ---
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBWeaponComponent> WeaponComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBInventoryComponent> InventoryComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBKnockReviveComponent> KnockReviveComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBParachuteComponent> ParachuteComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBMinimapDataComponent> MinimapDataComponent;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "StormBreaker|Components")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IslandOfDeath|Components")
     TObjectPtr<USBAntiCheatComponent> AntiCheatComponent;
 
     // --- Stance ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Movement")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Movement")
     ESBStance GetCurrentStance() const;
 
-    UPROPERTY(BlueprintAssignable, Category = "StormBreaker|Movement")
+    UPROPERTY(BlueprintAssignable, Category = "IslandOfDeath|Movement")
     FOnStanceChanged OnStanceChanged;
 
     // --- ADS ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Combat")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Combat")
     bool IsAiming() const { return bIsAiming; }
 
     // --- Camera Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     float DefaultBoomLength = 300.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     float ADSBoomLength = 100.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     float DefaultFOV = 90.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     float ADSFOV = 65.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     float ADSTransitionSpeed = 12.0f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     FVector CameraSocketOffset = FVector(0.0f, 60.0f, 70.0f);
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Camera")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Camera")
     FVector ADSCameraOffset = FVector(0.0f, 80.0f, 60.0f);
 
 protected:

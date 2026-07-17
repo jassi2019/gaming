@@ -1,4 +1,4 @@
-// Copyright StormBreaker Games. All Rights Reserved.
+// Copyright Island Of Death Games. All Rights Reserved.
 
 #pragma once
 
@@ -61,28 +61,28 @@ public:
 
     // --- Markers ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Minimap")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Minimap")
     const TArray<FSBMapMarker>& GetMarkers() const { return Markers; }
 
     // --- Compass ---
 
-    UFUNCTION(BlueprintPure, Category = "StormBreaker|Minimap")
+    UFUNCTION(BlueprintPure, Category = "IslandOfDeath|Minimap")
     float GetCompassHeading() const;
 
     // --- Ping ---
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Minimap")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Minimap")
     void SetPingLocation(const FVector& WorldLocation);
 
-    UFUNCTION(BlueprintCallable, Category = "StormBreaker|Minimap")
+    UFUNCTION(BlueprintCallable, Category = "IslandOfDeath|Minimap")
     void ClearPing();
 
     // --- Config ---
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Minimap")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Minimap")
     float MarkerUpdateRate = 0.1f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "StormBreaker|Minimap")
+    UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Minimap")
     float TeammateVisibleRange = 50000.0f;
 
 private:

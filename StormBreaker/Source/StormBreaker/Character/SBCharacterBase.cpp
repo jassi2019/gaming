@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/CapsuleComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -37,6 +38,16 @@ ASBCharacterBase::ASBCharacterBase(const FObjectInitializer& ObjectInitializer)
     // Capsule
     GetCapsuleComponent()->SetCapsuleHalfHeight(96.0f);
     GetCapsuleComponent()->SetCapsuleRadius(42.0f);
+
+    // Load Mannequin mesh
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshFinder(
+        TEXT("/Game/Characters/Mannequins/Meshes/SK_Mannequin"));
+    if (MeshFinder.Succeeded())
+    {
+        GetMesh()->SetSkeletalMeshAsset(MeshFinder.Object);
+        GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -96.0f));
+        GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+    }
 
     // Don't rotate character to camera
     bUseControllerRotationPitch = false;

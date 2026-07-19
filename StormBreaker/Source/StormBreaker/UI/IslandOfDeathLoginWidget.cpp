@@ -13,9 +13,13 @@
 UIslandOfDeathLoginWidget::UIslandOfDeathLoginWidget(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
-    TitleFont.Size = 64;
-    ButtonFont.Size = 22;
-    SmallFont.Size = 14;
+    // Use Engine's default Roboto font
+    UObject* RobotoObj = LoadObject<UObject>(nullptr, TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+    const UObject* FontObj = RobotoObj;
+
+    TitleFont = FSlateFontInfo(FontObj, 64);
+    ButtonFont = FSlateFontInfo(FontObj, 22);
+    SmallFont = FSlateFontInfo(FontObj, 14);
 }
 
 void UIslandOfDeathLoginWidget::NativeOnInitialized()

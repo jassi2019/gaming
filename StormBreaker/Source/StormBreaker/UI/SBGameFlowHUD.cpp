@@ -76,13 +76,16 @@ void ASBGameFlowHUD::SetupSplashVideo()
         SplashMediaTexture->UpdateResource();
     }
 
-    // Media sound component for audio playback
-    SplashMediaSound = NewObject<UMediaSoundComponent>(this);
+    // Media sound component for audio playback — must be attached to an actor
+    SplashMediaSound = NewObject<UMediaSoundComponent>(this, TEXT("SplashMediaSound"));
     if (SplashMediaSound)
     {
         SplashMediaSound->SetMediaPlayer(SplashMediaPlayer);
+        SplashMediaSound->bAutoActivate = true;
+        SplashMediaSound->SetupAttachment(GetRootComponent());
         SplashMediaSound->RegisterComponent();
-        UE_LOG(LogStormBreaker, Log, TEXT("MediaSoundComponent created for splash video audio"));
+        SplashMediaSound->Activate(true);
+        UE_LOG(LogStormBreaker, Log, TEXT("MediaSoundComponent created and attached for splash video audio"));
     }
 
     FString VideoPath = FPaths::ProjectContentDir() / TEXT("Splash/SplashVideo.mp4");

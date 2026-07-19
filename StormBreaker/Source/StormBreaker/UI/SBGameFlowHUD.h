@@ -16,14 +16,24 @@ enum class ESBFlowScreen : uint8
 {
     Splash,
     Login,
-    Lobby,
+    Loading,   // Graphics quality + resource download
+    Lobby,     // BGMI-style main menu
     InGame
 };
 
+UENUM(BlueprintType)
+enum class ESBGraphicsQuality : uint8
+{
+    Low,
+    Medium,
+    HD,
+    HDR,
+    UltraHD
+};
+
 /**
- * BGMI-style game flow HUD.
- * Renders: Splash (logo + loading) → Login (guest button) → Lobby (start match) → InGame HUD.
- * All drawn via Canvas — no Widget Blueprints needed.
+ * Full game flow HUD — Island of Death.
+ * Login → Loading (quality select + resource download) → Lobby (BGMI-style) → InGame.
  */
 UCLASS()
 class STORMBREAKER_API ASBGameFlowHUD : public AHUD
@@ -37,20 +47,16 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void DrawHUD() override;
 
-    // Transition to next screen
     void GoToScreen(ESBFlowScreen Screen);
 
     UPROPERTY(EditDefaultsOnly, Category = "IslandOfDeath|Flow")
     float SplashDuration = 10.0f;
 
     // --- Splash Video ---
-
     UPROPERTY()
     TObjectPtr<UMediaPlayer> SplashMediaPlayer;
-
     UPROPERTY()
     TObjectPtr<UMediaTexture> SplashMediaTexture;
-
     void SetupSplashVideo();
     void DrawSplashVideo();
     bool bSplashVideoPlaying;
@@ -59,10 +65,11 @@ private:
     // --- Screen Draws ---
     void DrawSplashScreen();
     void DrawLoginScreen();
+    void DrawLoadingScreen();
     void DrawLobbyScreen();
     void DrawInGameHUD();
 
-    // --- InGame HUD elements (from SBInGameHUD) ---
+    // --- InGame HUD ---
     void DrawHealthShieldBoost();
     void DrawWeaponAmmo();
     void DrawCrosshair();
@@ -71,9 +78,26 @@ private:
     void DrawAliveCount();
     void DrawFPSPing();
 
+    // --- Lobby sub-draws ---
+    void DrawLobbyTopBar();
+    void DrawLobbyLeftMenu();
+    void DrawLobbyRightPanels();
+    void DrawLobbyBottomBar();
+    void DrawLobbyStartButton();
+    void DrawLobbyGameLogo();
+    void DrawLobbyChatBar();
+
     // --- Helpers ---
     void DrawBar(float X, float Y, float W, float H, float Pct, FLinearColor Fill, FLinearColor Bg);
     void DrawButton(float X, float Y, float W, float H, const FString& Text, FLinearColor Color);
+    void DrawLoginButton(float X, float Y, float W, float H,
+        const FString& IconText, const FString& Label,
+        FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor);
+    void DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness = 2.0f);
+    void DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color);
+    void DrawSeparatorLine(float X, float Y, float W, const FString& Text);
+    void DrawPanel(float X, float Y, float W, float H, FLinearColor Bg, FLinearColor Border);
+    void DrawBadge(float X, float Y, const FString& Text, FLinearColor Bg, FLinearColor TextCol);
     bool IsMouseInRect(float X, float Y, float W, float H) const;
     bool WasMouseClicked() const;
     class ASBCharacterBase* GetPlayerCharacter() const;
@@ -88,26 +112,27 @@ private:
     ESBFlowScreen TransitionTarget;
     float TransitionTimer;
     float TransitionDuration;
-    bool bTransitionFadingOut; // true = fading to black, false = fading in
-
+    bool bTransitionFadingOut;
     void StartTransition(ESBFlowScreen Target, float Duration = 0.8f);
     void DrawTransitionOverlay();
 
-    // Login state
+    // --- Login state ---
     bool bLoggedIn;
 
-    // Lobby state
+    // --- Loading screen state ---
+    ESBGraphicsQuality SelectedQuality;
+    float DownloadProgress;
+    bool bDownloadComplete;
+    bool bDownloadStarted;
+    float DownloadSpeed; // simulated
+
+    // --- Lobby state ---
     int32 SelectedBotCount;
+    int32 SelectedSquadSize; // 1=solo, 2=duo, 4=squad
+    int32 LobbyMenuIndex;   // 0=Start, 1=Loadout, etc.
     bool bMatchStartRequested;
+    FString ChatMessage;
 
-    // Track mouse
+    // --- Track mouse ---
     bool bMouseWasPressed;
-
-    // --- Login Screen Helpers ---
-    void DrawLoginButton(float X, float Y, float W, float H,
-        const FString& IconText, const FString& Label,
-        FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor);
-    void DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness = 2.0f);
-    void DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color);
-    void DrawSeparatorLine(float X, float Y, float W, const FString& Text);
 };

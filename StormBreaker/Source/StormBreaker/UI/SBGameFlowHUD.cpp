@@ -31,28 +31,40 @@ ASBGameFlowHUD::ASBGameFlowHUD()
     FPSTimer = 0.0f;
     bLoggedIn = false;
     SelectedBotCount = 5;
+    SelectedSquadSize = 4;
+    LobbyMenuIndex = 0;
     bMatchStartRequested = false;
     bMouseWasPressed = false;
     bSplashVideoPlaying = false;
 
-    // Transition state
+    // Transition
     bTransitioning = false;
     TransitionTarget = ESBFlowScreen::Login;
     TransitionTimer = 0.0f;
     TransitionDuration = 0.8f;
     bTransitionFadingOut = true;
+
+    // Loading screen
+    SelectedQuality = ESBGraphicsQuality::HD;
+    DownloadProgress = 0.0f;
+    bDownloadComplete = false;
+    bDownloadStarted = false;
+    DownloadSpeed = 0.0f;
+
+    ChatMessage = TEXT("World [NoobMaster]: anyone for classic?");
 }
+
+// ============================================================================
+// SPLASH VIDEO
+// ============================================================================
 
 void ASBGameFlowHUD::SetupSplashVideo()
 {
-    // Create media player at runtime
     SplashMediaPlayer = NewObject<UMediaPlayer>(this);
     if (!SplashMediaPlayer) return;
-
     SplashMediaPlayer->SetLooping(false);
     SplashMediaPlayer->PlayOnOpen = true;
 
-    // Create media texture to render the video
     SplashMediaTexture = NewObject<UMediaTexture>(this);
     if (SplashMediaTexture)
     {
@@ -60,15 +72,12 @@ void ASBGameFlowHUD::SetupSplashVideo()
         SplashMediaTexture->UpdateResource();
     }
 
-    // Try to open the splash video from disk
     FString VideoPath = FPaths::ProjectContentDir() / TEXT("Splash/SplashVideo.mp4");
     FString AbsPath = FPaths::ConvertRelativePathToFull(VideoPath);
 
-    // Try multiple URL formats for maximum compatibility
     TArray<FString> UrlsToTry = {
         FString::Printf(TEXT("file://%s"), *AbsPath.Replace(TEXT("\\"), TEXT("/"))),
-        AbsPath,
-        VideoPath
+        AbsPath, VideoPath
     };
 
     for (const FString& Url : UrlsToTry)
@@ -80,47 +89,37 @@ void ASBGameFlowHUD::SetupSplashVideo()
             break;
         }
     }
-
-    if (!bSplashVideoPlaying)
-    {
-        UE_LOG(LogStormBreaker, Warning, TEXT("Splash video failed to open. Tried: %s"), *AbsPath);
-    }
 }
 
 void ASBGameFlowHUD::DrawSplashVideo()
 {
     if (!SplashMediaTexture || !SplashMediaPlayer) return;
-
-    // Check if video finished
     if (ScreenTimer > 1.0f && !SplashMediaPlayer->IsPlaying() && !SplashMediaPlayer->IsPreparing())
     {
         bSplashVideoPlaying = false;
         return;
     }
-
-    // Draw video texture fullscreen
     if (SplashMediaPlayer->IsPlaying() || SplashMediaPlayer->IsPreparing())
     {
         Canvas->SetDrawColor(FColor::White);
-        Canvas->DrawTile(SplashMediaTexture, 0, 0, Canvas->SizeX, Canvas->SizeY,
-            0.0f, 0.0f, 1.0f, 1.0f);
+        Canvas->DrawTile(SplashMediaTexture, 0, 0, Canvas->SizeX, Canvas->SizeY, 0, 0, 1, 1);
     }
 }
+
+// ============================================================================
+// BEGIN PLAY / TICK
+// ============================================================================
 
 void ASBGameFlowHUD::BeginPlay()
 {
     Super::BeginPlay();
-
-    // Setup splash video
     SetupSplashVideo();
 
-    // Start on Splash screen — hide the character
     APlayerController* PC = GetOwningPlayerController();
     if (PC)
     {
         PC->SetShowMouseCursor(true);
         PC->SetInputMode(FInputModeGameAndUI());
-
         APawn* Pawn = PC->GetPawn();
         if (Pawn)
         {
@@ -134,7 +133,6 @@ void ASBGameFlowHUD::BeginPlay()
 void ASBGameFlowHUD::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
     ScreenTimer += DeltaTime;
 
     FPSTimer += DeltaTime;
@@ -144,25 +142,36 @@ void ASBGameFlowHUD::Tick(float DeltaTime)
         CachedFPS = (DeltaTime > 0.001f) ? 1.0f / DeltaTime : 60.0f;
     }
 
-    // Auto-advance from Splash to Login
+    // Auto-advance splash
     if (CurrentScreen == ESBFlowScreen::Splash && ScreenTimer >= SplashDuration)
     {
         StartTransition(ESBFlowScreen::Login);
     }
 
-    // Handle smooth transition
+    // Loading screen: simulate download
+    if (CurrentScreen == ESBFlowScreen::Loading && bDownloadStarted && !bDownloadComplete)
+    {
+        // Speed varies for realism
+        float SpeedTarget = 45.0f + 20.0f * FMath::Sin(ScreenTimer * 1.5f);
+        DownloadSpeed = FMath::FInterpTo(DownloadSpeed, SpeedTarget, DeltaTime, 2.0f);
+        DownloadProgress += (DownloadSpeed / 850.0f) * DeltaTime; // ~850MB total, takes ~18s
+        if (DownloadProgress >= 1.0f)
+        {
+            DownloadProgress = 1.0f;
+            bDownloadComplete = true;
+        }
+    }
+
+    // Transition handling
     if (bTransitioning)
     {
         TransitionTimer += DeltaTime;
         float HalfDur = TransitionDuration * 0.5f;
-
         if (bTransitionFadingOut && TransitionTimer >= HalfDur)
         {
-            // Midpoint: switch screen
             bTransitionFadingOut = false;
             GoToScreen(TransitionTarget);
         }
-
         if (TransitionTimer >= TransitionDuration)
         {
             bTransitioning = false;
@@ -170,7 +179,6 @@ void ASBGameFlowHUD::Tick(float DeltaTime)
         }
     }
 
-    // Track mouse click state (block clicks during transition)
     APlayerController* PC = GetOwningPlayerController();
     if (PC)
     {
@@ -188,27 +196,6 @@ void ASBGameFlowHUD::StartTransition(ESBFlowScreen Target, float Duration)
     bTransitionFadingOut = true;
 }
 
-void ASBGameFlowHUD::DrawTransitionOverlay()
-{
-    if (!bTransitioning) return;
-
-    float HalfDur = TransitionDuration * 0.5f;
-    float Alpha;
-
-    if (bTransitionFadingOut)
-    {
-        // Fade to black
-        Alpha = FMath::Clamp(TransitionTimer / HalfDur, 0.0f, 1.0f);
-    }
-    else
-    {
-        // Fade from black
-        Alpha = FMath::Clamp(1.0f - (TransitionTimer - HalfDur) / HalfDur, 0.0f, 1.0f);
-    }
-
-    DrawRect(FLinearColor(0, 0, 0, Alpha), 0, 0, Canvas->SizeX, Canvas->SizeY);
-}
-
 void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
 {
     CurrentScreen = Screen;
@@ -219,10 +206,8 @@ void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
 
     if (Screen == ESBFlowScreen::InGame)
     {
-        // Enable gameplay
         PC->SetShowMouseCursor(false);
         PC->SetInputMode(FInputModeGameOnly());
-
         APawn* Pawn = PC->GetPawn();
         if (Pawn)
         {
@@ -230,10 +215,7 @@ void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
             Pawn->SetActorEnableCollision(true);
             Pawn->EnableInput(PC);
         }
-
-        // Start the match
-        ASBBattleRoyaleGameMode* GM = Cast<ASBBattleRoyaleGameMode>(
-            UGameplayStatics::GetGameMode(this));
+        ASBBattleRoyaleGameMode* GM = Cast<ASBBattleRoyaleGameMode>(UGameplayStatics::GetGameMode(this));
         if (GM)
         {
             GM->NumberOfBots = SelectedBotCount;
@@ -247,6 +229,16 @@ void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
     }
 }
 
+void ASBGameFlowHUD::DrawTransitionOverlay()
+{
+    if (!bTransitioning) return;
+    float HalfDur = TransitionDuration * 0.5f;
+    float Alpha = bTransitionFadingOut
+        ? FMath::Clamp(TransitionTimer / HalfDur, 0.0f, 1.0f)
+        : FMath::Clamp(1.0f - (TransitionTimer - HalfDur) / HalfDur, 0.0f, 1.0f);
+    DrawRect(FLinearColor(0, 0, 0, Alpha), 0, 0, Canvas->SizeX, Canvas->SizeY);
+}
+
 void ASBGameFlowHUD::DrawHUD()
 {
     Super::DrawHUD();
@@ -254,19 +246,19 @@ void ASBGameFlowHUD::DrawHUD()
 
     switch (CurrentScreen)
     {
-    case ESBFlowScreen::Splash: DrawSplashScreen(); break;
-    case ESBFlowScreen::Login:  DrawLoginScreen();  break;
-    case ESBFlowScreen::Lobby:  DrawLobbyScreen();  break;
-    case ESBFlowScreen::InGame: DrawInGameHUD();    break;
+    case ESBFlowScreen::Splash:  DrawSplashScreen();  break;
+    case ESBFlowScreen::Login:   DrawLoginScreen();   break;
+    case ESBFlowScreen::Loading: DrawLoadingScreen(); break;
+    case ESBFlowScreen::Lobby:   DrawLobbyScreen();   break;
+    case ESBFlowScreen::InGame:  DrawInGameHUD();     break;
     }
 
-    // Smooth fade overlay on top
     DrawTransitionOverlay();
 
-    // Fade-in when login screen first appears (from splash video)
-    if (CurrentScreen == ESBFlowScreen::Login && !bTransitioning && ScreenTimer < 1.0f)
+    // Fade-in on screen entry
+    if (!bTransitioning && ScreenTimer < 0.6f)
     {
-        float FadeIn = 1.0f - FMath::Clamp(ScreenTimer / 1.0f, 0.0f, 1.0f);
+        float FadeIn = 1.0f - FMath::Clamp(ScreenTimer / 0.6f, 0.0f, 1.0f);
         DrawRect(FLinearColor(0, 0, 0, FadeIn), 0, 0, Canvas->SizeX, Canvas->SizeY);
     }
 }
@@ -280,81 +272,29 @@ void ASBGameFlowHUD::DrawSplashScreen()
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
     const float T = ScreenTimer;
-    const float Duration = SplashDuration;
+
+    DrawRect(FLinearColor(0.01f, 0.015f, 0.03f), 0, 0, SW, SH);
 
     UFont* LargeFont = GEngine->GetLargeFont();
-    UFont* MedFont = GEngine->GetMediumFont();
     UFont* SmallFont = GEngine->GetSmallFont();
     UFont* TinyFont = GEngine->GetTinyFont();
     float TW, TH;
 
-    // === PHASE 1: Dark background with subtle blue gradient ===
-    DrawRect(FLinearColor(0.01f, 0.015f, 0.03f), 0, 0, SW, SH);
+    // Lightning flashes
+    bool bFlash = (T > 2.0f && T < 2.15f) || (T > 4.5f && T < 4.6f);
+    if (bFlash) DrawRect(FLinearColor(0.4f, 0.5f, 0.8f, 0.2f), 0, 0, SW, SH);
 
-    // Subtle diagonal light streaks (storm feel)
-    float StreakAlpha = 0.03f;
-    for (int32 i = 0; i < 5; i++)
-    {
-        float X = SW * (0.1f + i * 0.2f) + FMath::Sin(T * 0.5f + i) * 30.0f;
-        DrawRect(FLinearColor(0.3f, 0.5f, 0.8f, StreakAlpha), X, 0, 3, SH);
-    }
-
-    // Vignette — dark edges
-    float VigSize = SW * 0.15f;
-    DrawRect(FLinearColor(0, 0, 0, 0.6f), 0, 0, VigSize, SH);
-    DrawRect(FLinearColor(0, 0, 0, 0.6f), SW - VigSize, 0, VigSize, SH);
-    DrawRect(FLinearColor(0, 0, 0, 0.5f), 0, 0, SW, VigSize * 0.5f);
-    DrawRect(FLinearColor(0, 0, 0, 0.5f), 0, SH - VigSize * 0.5f, SW, VigSize * 0.5f);
-
-    // === PHASE 2: Lightning flashes ===
-    bool bFlash1 = (T > 2.0f && T < 2.15f);
-    bool bFlash2 = (T > 4.5f && T < 4.6f);
-    if (bFlash1 || bFlash2)
-    {
-        float FlashAlpha = bFlash1 ? (1.0f - (T - 2.0f) / 0.15f) : (1.0f - (T - 4.5f) / 0.1f);
-        DrawRect(FLinearColor(0.4f, 0.5f, 0.8f, FlashAlpha * 0.3f), 0, 0, SW, SH);
-    }
-
-    // === PHASE 3: Title fade-in (starts at 1.5s, full at 3.5s) ===
+    // Title fade-in
     float TitleAlpha = FMath::Clamp((T - 1.5f) / 2.0f, 0.0f, 1.0f);
     if (TitleAlpha > 0.0f)
     {
         FString Title = TEXT("ISLAND OF DEATH");
         Canvas->TextSize(LargeFont, Title, TW, TH);
-        float TitleX = (SW - TW) * 0.5f;
-        float TitleY = SH * 0.38f;
-
-        // Glow behind title
-        float GlowPulse = 0.5f + 0.5f * FMath::Sin(T * 3.0f);
-        float GlowAlpha = TitleAlpha * 0.15f * GlowPulse;
-        DrawRect(FLinearColor(0.3f, 0.5f, 1.0f, GlowAlpha),
-            TitleX - 30, TitleY - 10, TW + 60, TH + 20);
-
-        // Title text — metallic silver-blue
-        uint8 R = (uint8)(FMath::Lerp(180.0f, 220.0f, GlowPulse) * TitleAlpha);
-        uint8 G = (uint8)(FMath::Lerp(190.0f, 230.0f, GlowPulse) * TitleAlpha);
-        uint8 B = (uint8)(FMath::Lerp(210.0f, 255.0f, GlowPulse) * TitleAlpha);
-        Canvas->SetDrawColor(FColor(R, G, B, (uint8)(255 * TitleAlpha)));
-        Canvas->DrawText(LargeFont, Title, TitleX, TitleY);
+        Canvas->SetDrawColor(FColor(220, 230, 245, (uint8)(255 * TitleAlpha)));
+        Canvas->DrawText(LargeFont, Title, (SW - TW) * 0.5f, SH * 0.38f);
     }
 
-    // === PHASE 4: Accent line (draws from center at 3s) ===
-    float LineProgress = FMath::Clamp((T - 3.0f) / 1.0f, 0.0f, 1.0f);
-    if (LineProgress > 0.0f)
-    {
-        float LineW = SW * 0.2f * LineProgress;
-        float LineY = SH * 0.48f;
-        float LineX = (SW - LineW) * 0.5f;
-
-        // Glow
-        DrawRect(FLinearColor(0.1f, 0.3f, 0.8f, 0.2f * LineProgress),
-            LineX - 5, LineY - 3, LineW + 10, 8);
-        // Main line
-        DrawRect(FLinearColor(0.2f, 0.5f, 1.0f, LineProgress),
-            LineX, LineY, LineW, 2);
-    }
-
-    // === PHASE 5: Tagline fade-in (starts at 4s) ===
+    // Tagline
     float TagAlpha = FMath::Clamp((T - 4.0f) / 1.5f, 0.0f, 1.0f);
     if (TagAlpha > 0.0f)
     {
@@ -364,48 +304,19 @@ void ASBGameFlowHUD::DrawSplashScreen()
         Canvas->DrawText(SmallFont, Sub, (SW - TW) * 0.5f, SH * 0.52f);
     }
 
-    // === PHASE 6: Bottom info (fades in at 5s) ===
-    float BottomAlpha = FMath::Clamp((T - 5.0f) / 1.0f, 0.0f, 1.0f);
-    if (BottomAlpha > 0.0f)
-    {
-        // Engine version
-        Canvas->SetDrawColor(FColor(60, 70, 90, (uint8)(120 * BottomAlpha)));
-        Canvas->DrawText(TinyFont, TEXT("Unreal Engine 5.8"), SW - 180, SH - 30);
-
-        // Studio name
-        Canvas->DrawText(TinyFont, TEXT("Island Of Death Games"), 20, SH - 30);
-    }
-
-    // === PHASE 7: Loading bar (starts at 2s) ===
-    float BarProgress = FMath::Clamp((T - 2.0f) / (Duration - 3.0f), 0.0f, 1.0f);
+    // Loading bar
+    float BarProgress = FMath::Clamp((T - 2.0f) / (SplashDuration - 3.0f), 0.0f, 1.0f);
     float BarW = SW * 0.25f;
-    float BarH = 4.0f;
     float BarX = (SW - BarW) * 0.5f;
-    float BarY = SH * 0.62f;
-
-    DrawBar(BarX, BarY, BarW, BarH, BarProgress,
+    DrawBar(BarX, SH * 0.62f, BarW, 4, BarProgress,
         FLinearColor(0.2f, 0.5f, 1.0f, 0.8f), FLinearColor(0.1f, 0.1f, 0.15f, 0.5f));
 
-    // Loading text
-    float LoadAlpha2 = FMath::Clamp((T - 2.0f) / 1.0f, 0.0f, 1.0f);
-    FString LoadStr = TEXT("LOADING...");
-    Canvas->TextSize(TinyFont, LoadStr, TW, TH);
-    Canvas->SetDrawColor(FColor(120, 130, 150, (uint8)(180 * LoadAlpha2)));
-    Canvas->DrawText(TinyFont, LoadStr, (SW - TW) * 0.5f, BarY + 12.0f);
-
-    // === FADE: Black at start and end ===
-    // Fade from black (0-1s)
-    if (T < 1.0f)
+    // Fade edges
+    if (T < 1.0f) DrawRect(FLinearColor(0, 0, 0, 1.0f - T), 0, 0, SW, SH);
+    if (T > SplashDuration - 1.5f)
     {
-        float FadeAlpha = 1.0f - T;
-        DrawRect(FLinearColor(0, 0, 0, FadeAlpha), 0, 0, SW, SH);
-    }
-
-    // Fade to black (last 1.5s)
-    if (T > Duration - 1.5f)
-    {
-        float FadeAlpha = (T - (Duration - 1.5f)) / 1.5f;
-        DrawRect(FLinearColor(0, 0, 0, FadeAlpha), 0, 0, SW, SH);
+        float A = (T - (SplashDuration - 1.5f)) / 1.5f;
+        DrawRect(FLinearColor(0, 0, 0, A), 0, 0, SW, SH);
     }
 }
 
@@ -424,11 +335,8 @@ void ASBGameFlowHUD::DrawLoginScreen()
     UFont* TinyFont = GEngine->GetTinyFont();
     float TW, TH;
 
-    // ====== BACKGROUND ======
-    // Deep black base
+    // Background
     DrawRect(FLinearColor(0.02f, 0.02f, 0.03f), 0, 0, SW, SH);
-
-    // Subtle dark red gradient at top (cinematic feel)
     for (int32 i = 0; i < 8; i++)
     {
         float Y = i * (SH * 0.05f);
@@ -436,294 +344,115 @@ void ASBGameFlowHUD::DrawLoginScreen()
         DrawRect(FLinearColor(0.3f, 0.05f, 0.02f, A), 0, Y, SW, SH * 0.05f);
     }
 
-    // Subtle red glow at bottom edges
-    DrawRect(FLinearColor(0.4f, 0.05f, 0.02f, 0.04f), 0, SH * 0.7f, SW, SH * 0.3f);
-
-    // ====== CORNER ACCENTS (red frame like screenshot) ======
     DrawCornerAccents(SW, SH, 40.0f, FLinearColor(0.7f, 0.1f, 0.05f, 0.6f));
 
-    // ====== TITLE: "ISLAND OF DEATH" ======
-    // Main title — two parts with different styles
-
-    // "ISLAND" — large, white/silver
+    // Title
     FString TitleTop = TEXT("ISLAND");
     Canvas->TextSize(LargeFont, TitleTop, TW, TH);
     float TitleCenterX = SW * 0.5f;
     float TitleY = SH * 0.12f;
-
-    // Glow behind title
-    float GlowPulse = 0.7f + 0.3f * FMath::Sin(ScreenTimer * 2.0f);
-    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.08f * GlowPulse),
-        TitleCenterX - TW * 0.7f, TitleY - 10, TW * 1.4f, TH * 3.5f);
-
     Canvas->SetDrawColor(FColor(230, 230, 240));
     Canvas->DrawText(LargeFont, TitleTop, TitleCenterX - TW * 0.5f, TitleY);
 
-    // "OF" — smaller, positioned between
     FString TitleOf = TEXT("OF");
     Canvas->TextSize(MedFont, TitleOf, TW, TH);
     Canvas->SetDrawColor(FColor(200, 200, 210, 200));
-    Canvas->DrawText(MedFont, TitleOf, TitleCenterX - TW * 0.5f, TitleY + 38.0f);
+    Canvas->DrawText(MedFont, TitleOf, TitleCenterX - TW * 0.5f, TitleY + 38);
 
-    // "DEATH" — large, blood red
-    FString TitleBottom = TEXT("DEATH");
-    Canvas->TextSize(LargeFont, TitleBottom, TW, TH);
+    FString TitleDeath = TEXT("DEATH");
+    Canvas->TextSize(LargeFont, TitleDeath, TW, TH);
     Canvas->SetDrawColor(FColor(200, 30, 20));
-    Canvas->DrawText(LargeFont, TitleBottom, TitleCenterX - TW * 0.5f, TitleY + 55.0f);
+    Canvas->DrawText(LargeFont, TitleDeath, TitleCenterX - TW * 0.5f, TitleY + 55);
 
-    // ====== TAGLINE with accent lines ======
-    float TaglineY = TitleY + 115.0f;
-
-    // Left accent line
-    float LineW = SW * 0.12f;
-    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.5f), TitleCenterX - LineW - 10, TaglineY + 8, LineW, 1);
-    // Right accent line
-    DrawRect(FLinearColor(0.5f, 0.1f, 0.05f, 0.5f), TitleCenterX + 10, TaglineY + 8, LineW, 1);
-
-    // Tagline text — "Some Spirits Don't seek revenge..." in italic white
-    FString Tag1 = TEXT("Some Spirits Don't seek revenge...");
-    Canvas->TextSize(TinyFont, Tag1, TW, TH);
+    // Tagline
+    float TagY = TitleY + 115;
     Canvas->SetDrawColor(FColor(200, 200, 200, 220));
-    Canvas->DrawText(TinyFont, Tag1, TitleCenterX - TW * 0.5f - 40, TaglineY);
+    Canvas->DrawText(TinyFont, TEXT("Some Spirits Don't seek revenge..."), TitleCenterX - 140, TagY);
+    Canvas->SetDrawColor(FColor(220, 50, 30));
+    Canvas->DrawText(TinyFont, TEXT("they seek survival"), TitleCenterX + 65, TagY);
 
-    // "they seek survival" in red
-    FString Tag2 = TEXT("they seek survival");
-    float T1W, T1H;
-    Canvas->TextSize(TinyFont, Tag1, T1W, T1H);
-    Canvas->SetDrawColor(FColor(220, 50, 30, 255));
-    Canvas->DrawText(TinyFont, Tag2, TitleCenterX - TW * 0.5f + T1W - 38, TaglineY);
-
-    // ====== LOGIN BUTTONS ======
-    float BtnW = SW * 0.35f;
-    if (BtnW < 300.0f) BtnW = 300.0f;
-    if (BtnW > 450.0f) BtnW = 450.0f;
+    // Buttons
+    float BtnW = FMath::Clamp(SW * 0.35f, 300.0f, 450.0f);
     float BtnH = 48.0f;
     float BtnX = (SW - BtnW) * 0.5f;
-    float BtnStartY = SH * 0.45f;
     float BtnGap = 12.0f;
 
-    // --- Continue with Google ---
-    float GoogleY = BtnStartY;
-    DrawLoginButton(BtnX, GoogleY, BtnW, BtnH,
-        TEXT("G"), TEXT("CONTINUE WITH GOOGLE"),
-        FLinearColor(0.92f, 0.92f, 0.90f),   // Light gray bg
-        FLinearColor(0.7f, 0.7f, 0.68f),      // Gray border
-        FLinearColor(0.15f, 0.15f, 0.15f));    // Dark text
-
+    float GoogleY = SH * 0.45f;
+    DrawLoginButton(BtnX, GoogleY, BtnW, BtnH, TEXT("G"), TEXT("CONTINUE WITH GOOGLE"),
+        FLinearColor(0.92f, 0.92f, 0.90f), FLinearColor(0.7f, 0.7f, 0.68f), FLinearColor(0.15f, 0.15f, 0.15f));
     if (IsMouseInRect(BtnX, GoogleY, BtnW, BtnH) && WasMouseClicked())
     {
         UGameInstance* GI = GetGameInstance();
-        if (GI)
-        {
-            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend) Backend->Login(ESBAuthProvider::EOS);
-        }
-        StartTransition(ESBFlowScreen::Lobby);
+        if (GI) { USBBackendSubsystem* B = GI->GetSubsystem<USBBackendSubsystem>(); if (B) B->Login(ESBAuthProvider::EOS); }
+        StartTransition(ESBFlowScreen::Loading);
     }
 
-    // --- Continue with Facebook ---
-    float FacebookY = GoogleY + BtnH + BtnGap;
-    DrawLoginButton(BtnX, FacebookY, BtnW, BtnH,
-        TEXT("f"), TEXT("CONTINUE WITH FACEBOOK"),
-        FLinearColor(0.15f, 0.35f, 0.70f),    // Facebook blue
-        FLinearColor(0.2f, 0.45f, 0.85f),     // Lighter blue border
-        FLinearColor(1.0f, 1.0f, 1.0f));       // White text
-
-    if (IsMouseInRect(BtnX, FacebookY, BtnW, BtnH) && WasMouseClicked())
+    float FbY = GoogleY + BtnH + BtnGap;
+    DrawLoginButton(BtnX, FbY, BtnW, BtnH, TEXT("f"), TEXT("CONTINUE WITH FACEBOOK"),
+        FLinearColor(0.15f, 0.35f, 0.70f), FLinearColor(0.2f, 0.45f, 0.85f), FLinearColor(1, 1, 1));
+    if (IsMouseInRect(BtnX, FbY, BtnW, BtnH) && WasMouseClicked())
     {
         UGameInstance* GI = GetGameInstance();
-        if (GI)
-        {
-            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend) Backend->Login(ESBAuthProvider::EOS);
-        }
-        StartTransition(ESBFlowScreen::Lobby);
+        if (GI) { USBBackendSubsystem* B = GI->GetSubsystem<USBBackendSubsystem>(); if (B) B->Login(ESBAuthProvider::EOS); }
+        StartTransition(ESBFlowScreen::Loading);
     }
 
-    // --- Continue with Apple ---
-    float AppleY = FacebookY + BtnH + BtnGap;
-    DrawLoginButton(BtnX, AppleY, BtnW, BtnH,
-        TEXT("A"), TEXT("CONTINUE WITH APPLE"),
-        FLinearColor(0.12f, 0.12f, 0.14f),    // Dark bg
-        FLinearColor(0.35f, 0.35f, 0.38f),     // Gray border
-        FLinearColor(1.0f, 1.0f, 1.0f));       // White text
-
+    float AppleY = FbY + BtnH + BtnGap;
+    DrawLoginButton(BtnX, AppleY, BtnW, BtnH, TEXT("A"), TEXT("CONTINUE WITH APPLE"),
+        FLinearColor(0.12f, 0.12f, 0.14f), FLinearColor(0.35f, 0.35f, 0.38f), FLinearColor(1, 1, 1));
     if (IsMouseInRect(BtnX, AppleY, BtnW, BtnH) && WasMouseClicked())
     {
         UGameInstance* GI = GetGameInstance();
-        if (GI)
-        {
-            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend) Backend->Login(ESBAuthProvider::EOS);
-        }
-        StartTransition(ESBFlowScreen::Lobby);
+        if (GI) { USBBackendSubsystem* B = GI->GetSubsystem<USBBackendSubsystem>(); if (B) B->Login(ESBAuthProvider::EOS); }
+        StartTransition(ESBFlowScreen::Loading);
     }
 
-    // ====== OR SEPARATOR ======
-    float OrY = AppleY + BtnH + 18.0f;
+    // OR separator
+    float OrY = AppleY + BtnH + 18;
     DrawSeparatorLine(BtnX, OrY, BtnW, TEXT("OR"));
 
-    // ====== PLAY AS GUEST BUTTON (Red border, dark bg) ======
-    float GuestY = OrY + 30.0f;
-    float GuestH = 55.0f;
-
-    // Dark background with red border
+    // Guest button
+    float GuestY = OrY + 30;
+    float GuestH = 55;
     bool bGuestHover = IsMouseInRect(BtnX, GuestY, BtnW, GuestH);
-    FLinearColor GuestBg = bGuestHover
-        ? FLinearColor(0.15f, 0.04f, 0.03f)
-        : FLinearColor(0.08f, 0.03f, 0.02f);
-    FLinearColor GuestBorder = FLinearColor(0.7f, 0.12f, 0.08f, bGuestHover ? 1.0f : 0.7f);
+    DrawRect(bGuestHover ? FLinearColor(0.15f, 0.04f, 0.03f) : FLinearColor(0.08f, 0.03f, 0.02f),
+        BtnX, GuestY, BtnW, GuestH);
+    DrawRoundedBorder(BtnX, GuestY, BtnW, GuestH, FLinearColor(0.7f, 0.12f, 0.08f, bGuestHover ? 1.0f : 0.7f));
 
-    DrawRect(GuestBg, BtnX, GuestY, BtnW, GuestH);
-    DrawRoundedBorder(BtnX, GuestY, BtnW, GuestH, GuestBorder, 2.0f);
-
-    // Red soldier icon (simple)
     Canvas->SetDrawColor(FColor(220, 50, 30));
     Canvas->DrawText(SmallFont, TEXT(">>"), BtnX + 18, GuestY + 8);
-
-    // "PLAY AS GUEST" — bold red
-    FString GuestTitle = TEXT("PLAY AS GUEST");
-    Canvas->SetDrawColor(FColor(220, 50, 30));
-    Canvas->DrawText(SmallFont, GuestTitle, BtnX + 55, GuestY + 8);
-
-    // "Jump into the island as a guest" — subtitle
-    FString GuestSub = TEXT("Jump into the island as a guest");
+    Canvas->DrawText(SmallFont, TEXT("PLAY AS GUEST"), BtnX + 55, GuestY + 8);
     Canvas->SetDrawColor(FColor(140, 140, 140));
-    Canvas->DrawText(TinyFont, GuestSub, BtnX + 55, GuestY + 30);
-
-    // Arrow on right side
+    Canvas->DrawText(TinyFont, TEXT("Jump into the island as a guest"), BtnX + 55, GuestY + 30);
     Canvas->SetDrawColor(FColor(200, 50, 30));
     Canvas->DrawText(SmallFont, TEXT(">"), BtnX + BtnW - 30, GuestY + 14);
 
     if (IsMouseInRect(BtnX, GuestY, BtnW, GuestH) && WasMouseClicked())
     {
         UGameInstance* GI = GetGameInstance();
-        if (GI)
-        {
-            USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
-            if (Backend) Backend->Login(ESBAuthProvider::Guest);
-        }
-        StartTransition(ESBFlowScreen::Lobby);
+        if (GI) { USBBackendSubsystem* B = GI->GetSubsystem<USBBackendSubsystem>(); if (B) B->Login(ESBAuthProvider::Guest); }
+        StartTransition(ESBFlowScreen::Loading);
     }
 
-    // ====== GUEST DISCLAIMER ======
-    float DisclaimerY = GuestY + GuestH + 20.0f;
-    FString Disclaimer = TEXT("Your progress as a guest will be");
-    FString Disclaimer2 = TEXT("stored on this device only.");
-    Canvas->TextSize(TinyFont, Disclaimer, TW, TH);
+    // Disclaimer
+    float DisY = GuestY + GuestH + 20;
+    FString D1 = TEXT("Your progress as a guest will be");
+    Canvas->TextSize(TinyFont, D1, TW, TH);
     Canvas->SetDrawColor(FColor(90, 90, 100));
-    Canvas->DrawText(TinyFont, Disclaimer, (SW - TW) * 0.5f, DisclaimerY);
-    Canvas->TextSize(TinyFont, Disclaimer2, TW, TH);
-    Canvas->DrawText(TinyFont, Disclaimer2, (SW - TW) * 0.5f, DisclaimerY + 16);
-}
-
-// --- Login Screen Helper: Styled Button ---
-void ASBGameFlowHUD::DrawLoginButton(float X, float Y, float W, float H,
-    const FString& IconText, const FString& Label,
-    FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor)
-{
-    bool bHovered = IsMouseInRect(X, Y, W, H);
-    FLinearColor Bg = bHovered ? BgColor * 1.15f : BgColor;
-
-    // Button background
-    DrawRect(Bg, X, Y, W, H);
-
-    // Border
-    DrawRoundedBorder(X, Y, W, H, BorderColor, bHovered ? 2.0f : 1.0f);
-
-    // Highlight on top edge
-    DrawRect(FLinearColor(1, 1, 1, 0.08f), X + 1, Y + 1, W - 2, 1);
-
-    UFont* SmallFont = GEngine->GetSmallFont();
-    UFont* MedFont = GEngine->GetMediumFont();
-    float TW, TH;
-
-    // Icon text (left side)
-    Canvas->SetDrawColor(FColor(
-        (uint8)(TextColor.R * 255),
-        (uint8)(TextColor.G * 255),
-        (uint8)(TextColor.B * 255)));
-    Canvas->DrawText(MedFont, IconText, X + 20, Y + (H - 20) * 0.5f);
-
-    // Separator line
-    DrawRect(FLinearColor(TextColor.R, TextColor.G, TextColor.B, 0.2f),
-        X + 55, Y + 8, 1, H - 16);
-
-    // Label text (centered in remaining space)
-    Canvas->TextSize(SmallFont, Label, TW, TH);
-    float LabelX = X + 60 + (W - 60 - TW) * 0.5f;
-    Canvas->SetDrawColor(FColor(
-        (uint8)(TextColor.R * 255),
-        (uint8)(TextColor.G * 255),
-        (uint8)(TextColor.B * 255)));
-    Canvas->DrawText(SmallFont, Label, LabelX, Y + (H - TH) * 0.5f);
-}
-
-void ASBGameFlowHUD::DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness)
-{
-    // Top
-    DrawRect(Color, X, Y, W, Thickness);
-    // Bottom
-    DrawRect(Color, X, Y + H - Thickness, W, Thickness);
-    // Left
-    DrawRect(Color, X, Y, Thickness, H);
-    // Right
-    DrawRect(Color, X + W - Thickness, Y, Thickness, H);
-}
-
-void ASBGameFlowHUD::DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color)
-{
-    float T = 2.0f; // thickness
-    float Inset = 15.0f;
-
-    // Top-left corner
-    DrawRect(Color, Inset, Inset, Size, T);
-    DrawRect(Color, Inset, Inset, T, Size);
-
-    // Top-right corner
-    DrawRect(Color, SW - Inset - Size, Inset, Size, T);
-    DrawRect(Color, SW - Inset - T, Inset, T, Size);
-
-    // Bottom-left corner
-    DrawRect(Color, Inset, SH - Inset - T, Size, T);
-    DrawRect(Color, Inset, SH - Inset - Size, T, Size);
-
-    // Bottom-right corner
-    DrawRect(Color, SW - Inset - Size, SH - Inset - T, Size, T);
-    DrawRect(Color, SW - Inset - T, SH - Inset - Size, T, Size);
-}
-
-void ASBGameFlowHUD::DrawSeparatorLine(float X, float Y, float W, const FString& Text)
-{
-    UFont* TinyFont = GEngine->GetTinyFont();
-    float TW, TH;
-    Canvas->TextSize(TinyFont, Text, TW, TH);
-
-    float TextX = X + (W - TW) * 0.5f;
-    float LineY = Y + TH * 0.5f;
-    float Gap = 10.0f;
-
-    // Left line
-    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), X, LineY, TextX - X - Gap, 1);
-    // Right line
-    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), TextX + TW + Gap, LineY, X + W - TextX - TW - Gap, 1);
-
-    // Text
-    Canvas->SetDrawColor(FColor(120, 100, 80));
-    Canvas->DrawText(TinyFont, Text, TextX, Y);
+    Canvas->DrawText(TinyFont, D1, (SW - TW) * 0.5f, DisY);
+    FString D2 = TEXT("stored on this device only.");
+    Canvas->TextSize(TinyFont, D2, TW, TH);
+    Canvas->DrawText(TinyFont, D2, (SW - TW) * 0.5f, DisY + 16);
 }
 
 // ============================================================================
-// LOBBY SCREEN
+// LOADING SCREEN — Graphics Quality + Resource Download
 // ============================================================================
 
-void ASBGameFlowHUD::DrawLobbyScreen()
+void ASBGameFlowHUD::DrawLoadingScreen()
 {
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
-
-    // Dark blue gradient-ish background
-    DrawRect(FLinearColor(0.03f, 0.04f, 0.08f), 0, 0, SW, SH);
 
     UFont* LargeFont = GEngine->GetLargeFont();
     UFont* MedFont = GEngine->GetMediumFont();
@@ -731,120 +460,666 @@ void ASBGameFlowHUD::DrawLobbyScreen()
     UFont* TinyFont = GEngine->GetTinyFont();
     float TW, TH;
 
-    // Top bar
-    DrawRect(FLinearColor(0.08f, 0.08f, 0.12f, 0.9f), 0, 0, SW, 60.0f);
+    // Dark background
+    DrawRect(FLinearColor(0.02f, 0.025f, 0.04f), 0, 0, SW, SH);
 
-    // Player info (top left)
+    // Subtle animated particles (dots floating up)
+    for (int32 i = 0; i < 15; i++)
+    {
+        float Seed = i * 137.5f;
+        float PX = FMath::Fmod(Seed * 7.3f, SW);
+        float PY = FMath::Fmod(SH - FMath::Fmod(ScreenTimer * (20 + i * 3) + Seed, SH + 50), SH);
+        float PA = 0.15f + 0.1f * FMath::Sin(ScreenTimer + Seed);
+        DrawRect(FLinearColor(0.3f, 0.5f, 0.8f, PA), PX, PY, 2, 2);
+    }
+
+    // Title
+    FString Title = TEXT("ISLAND OF DEATH");
+    Canvas->TextSize(LargeFont, Title, TW, TH);
+    Canvas->SetDrawColor(FColor(220, 220, 230));
+    Canvas->DrawText(LargeFont, Title, (SW - TW) * 0.5f, SH * 0.08f);
+
+    // ====== GRAPHICS QUALITY SELECTOR ======
+    float PanelW = FMath::Clamp(SW * 0.6f, 400.0f, 700.0f);
+    float PanelH = 280.0f;
+    float PanelX = (SW - PanelW) * 0.5f;
+    float PanelY = SH * 0.18f;
+
+    DrawPanel(PanelX, PanelY, PanelW, PanelH,
+        FLinearColor(0.04f, 0.04f, 0.06f, 0.9f), FLinearColor(0.2f, 0.15f, 0.1f, 0.5f));
+
+    // Section title
+    FString QualTitle = TEXT("SELECT GRAPHICS QUALITY");
+    Canvas->TextSize(SmallFont, QualTitle, TW, TH);
+    Canvas->SetDrawColor(FColor(255, 220, 50));
+    Canvas->DrawText(SmallFont, QualTitle, PanelX + (PanelW - TW) * 0.5f, PanelY + 15);
+
+    // Quality options
+    struct FQualityOption
+    {
+        ESBGraphicsQuality Quality;
+        FString Name;
+        FString Desc;
+        FString Size;
+        FLinearColor Color;
+    };
+
+    FQualityOption Options[] = {
+        { ESBGraphicsQuality::Low,     TEXT("SMOOTH"),    TEXT("Best performance, low textures"),    TEXT("320 MB"), FLinearColor(0.4f, 0.7f, 0.3f) },
+        { ESBGraphicsQuality::Medium,  TEXT("BALANCED"),  TEXT("Good visuals & performance"),        TEXT("520 MB"), FLinearColor(0.3f, 0.6f, 0.8f) },
+        { ESBGraphicsQuality::HD,      TEXT("HD"),        TEXT("High quality textures"),             TEXT("680 MB"), FLinearColor(0.7f, 0.5f, 0.2f) },
+        { ESBGraphicsQuality::HDR,     TEXT("HDR"),       TEXT("HDR lighting + high textures"),      TEXT("850 MB"), FLinearColor(0.8f, 0.3f, 0.2f) },
+        { ESBGraphicsQuality::UltraHD, TEXT("ULTRA HD"),  TEXT("Maximum quality, 4K textures"),      TEXT("1.2 GB"), FLinearColor(0.9f, 0.2f, 0.6f) },
+    };
+
+    float OptStartY = PanelY + 50;
+    float OptH = 40.0f;
+    float OptGap = 5.0f;
+
+    for (int32 i = 0; i < 5; i++)
+    {
+        float OY = OptStartY + i * (OptH + OptGap);
+        float OX = PanelX + 15;
+        float OW = PanelW - 30;
+
+        bool bSelected = (SelectedQuality == Options[i].Quality);
+        bool bHovered = IsMouseInRect(OX, OY, OW, OptH);
+
+        // Background
+        FLinearColor OptBg = bSelected
+            ? FLinearColor(Options[i].Color.R * 0.2f, Options[i].Color.G * 0.2f, Options[i].Color.B * 0.2f, 0.8f)
+            : (bHovered ? FLinearColor(0.08f, 0.08f, 0.1f) : FLinearColor(0.05f, 0.05f, 0.07f));
+        DrawRect(OptBg, OX, OY, OW, OptH);
+
+        // Selection border
+        if (bSelected)
+        {
+            DrawRoundedBorder(OX, OY, OW, OptH, Options[i].Color, 2.0f);
+        }
+
+        // Radio circle
+        float CircleX = OX + 20;
+        float CircleY = OY + OptH * 0.5f - 5;
+        DrawRect(FLinearColor(0.3f, 0.3f, 0.35f), CircleX - 5, CircleY - 5, 10, 10);
+        if (bSelected)
+        {
+            DrawRect(Options[i].Color, CircleX - 3, CircleY - 3, 6, 6);
+        }
+
+        // Name
+        Canvas->SetDrawColor(bSelected ? FColor::White : FColor(180, 180, 180));
+        Canvas->DrawText(SmallFont, Options[i].Name, OX + 40, OY + 5);
+
+        // Description
+        Canvas->SetDrawColor(FColor(120, 120, 130));
+        Canvas->DrawText(TinyFont, Options[i].Desc, OX + 40, OY + 23);
+
+        // Size (right side)
+        Canvas->TextSize(TinyFont, Options[i].Size, TW, TH);
+        Canvas->SetDrawColor(FColor(150, 150, 160));
+        Canvas->DrawText(TinyFont, Options[i].Size, OX + OW - TW - 15, OY + 12);
+
+        // Click handler
+        if (bHovered && WasMouseClicked())
+        {
+            SelectedQuality = Options[i].Quality;
+        }
+    }
+
+    // ====== DOWNLOAD SECTION ======
+    float DlY = PanelY + PanelH + 30;
+    float DlW = PanelW;
+    float DlX = PanelX;
+
+    if (!bDownloadStarted)
+    {
+        // DOWNLOAD RESOURCES button
+        float DlBtnH = 55;
+        bool bDlHover = IsMouseInRect(DlX, DlY, DlW, DlBtnH);
+
+        DrawRect(bDlHover ? FLinearColor(0.85f, 0.6f, 0.12f) : FLinearColor(0.75f, 0.52f, 0.08f),
+            DlX, DlY, DlW, DlBtnH);
+        DrawRect(FLinearColor(1, 1, 1, 0.1f), DlX, DlY, DlW, 2);
+
+        FString DlText = TEXT("DOWNLOAD RESOURCES");
+        Canvas->TextSize(MedFont, DlText, TW, TH);
+        Canvas->SetDrawColor(FColor::White);
+        Canvas->DrawText(MedFont, DlText, DlX + (DlW - TW) * 0.5f, DlY + (DlBtnH - TH) * 0.5f);
+
+        // Size info
+        FString SizeInfo;
+        switch (SelectedQuality)
+        {
+        case ESBGraphicsQuality::Low:     SizeInfo = TEXT("Download: 320 MB"); break;
+        case ESBGraphicsQuality::Medium:  SizeInfo = TEXT("Download: 520 MB"); break;
+        case ESBGraphicsQuality::HD:      SizeInfo = TEXT("Download: 680 MB"); break;
+        case ESBGraphicsQuality::HDR:     SizeInfo = TEXT("Download: 850 MB"); break;
+        case ESBGraphicsQuality::UltraHD: SizeInfo = TEXT("Download: 1.2 GB"); break;
+        }
+        Canvas->TextSize(TinyFont, SizeInfo, TW, TH);
+        Canvas->SetDrawColor(FColor(180, 180, 180));
+        Canvas->DrawText(TinyFont, SizeInfo, DlX + (DlW - TW) * 0.5f, DlY + DlBtnH + 10);
+
+        if (bDlHover && WasMouseClicked())
+        {
+            bDownloadStarted = true;
+            DownloadProgress = 0.0f;
+            DownloadSpeed = 10.0f;
+        }
+    }
+    else if (!bDownloadComplete)
+    {
+        // Download progress
+        DrawPanel(DlX, DlY, DlW, 90,
+            FLinearColor(0.04f, 0.04f, 0.06f, 0.9f), FLinearColor(0.2f, 0.15f, 0.1f, 0.3f));
+
+        // Progress bar
+        float BarY = DlY + 15;
+        DrawBar(DlX + 20, BarY, DlW - 40, 20, DownloadProgress,
+            FLinearColor(0.2f, 0.7f, 0.3f, 0.9f), FLinearColor(0.1f, 0.1f, 0.12f));
+
+        // Percentage
+        FString PctStr = FString::Printf(TEXT("%.1f%%"), DownloadProgress * 100.0f);
+        Canvas->TextSize(SmallFont, PctStr, TW, TH);
+        Canvas->SetDrawColor(FColor::White);
+        Canvas->DrawText(SmallFont, PctStr, DlX + (DlW - TW) * 0.5f, BarY + 1);
+
+        // Speed + remaining
+        float TotalMB;
+        switch (SelectedQuality)
+        {
+        case ESBGraphicsQuality::Low:     TotalMB = 320; break;
+        case ESBGraphicsQuality::Medium:  TotalMB = 520; break;
+        case ESBGraphicsQuality::HD:      TotalMB = 680; break;
+        case ESBGraphicsQuality::HDR:     TotalMB = 850; break;
+        case ESBGraphicsQuality::UltraHD: TotalMB = 1200; break;
+        default: TotalMB = 680; break;
+        }
+
+        float Downloaded = TotalMB * DownloadProgress;
+        FString SpeedStr = FString::Printf(TEXT("%.1f MB/s  |  %.0f / %.0f MB"),
+            DownloadSpeed, Downloaded, TotalMB);
+        Canvas->TextSize(TinyFont, SpeedStr, TW, TH);
+        Canvas->SetDrawColor(FColor(160, 160, 170));
+        Canvas->DrawText(TinyFont, SpeedStr, DlX + (DlW - TW) * 0.5f, BarY + 40);
+
+        // ETA
+        float Remaining = (TotalMB - Downloaded);
+        float ETA = (DownloadSpeed > 1.0f) ? Remaining / DownloadSpeed : 999.0f;
+        FString ETAStr = FString::Printf(TEXT("ETA: %.0fs"), ETA);
+        Canvas->TextSize(TinyFont, ETAStr, TW, TH);
+        Canvas->SetDrawColor(FColor(120, 120, 130));
+        Canvas->DrawText(TinyFont, ETAStr, DlX + (DlW - TW) * 0.5f, BarY + 58);
+    }
+    else
+    {
+        // Download complete — ENTER LOBBY button
+        float EnterH = 55;
+        bool bEnterHover = IsMouseInRect(DlX, DlY, DlW, EnterH);
+
+        DrawRect(bEnterHover ? FLinearColor(0.2f, 0.75f, 0.3f) : FLinearColor(0.15f, 0.6f, 0.2f),
+            DlX, DlY, DlW, EnterH);
+
+        FString EnterText = TEXT("ENTER LOBBY");
+        Canvas->TextSize(MedFont, EnterText, TW, TH);
+        Canvas->SetDrawColor(FColor::White);
+        Canvas->DrawText(MedFont, EnterText, DlX + (DlW - TW) * 0.5f, DlY + (EnterH - TH) * 0.5f);
+
+        // Checkmark
+        Canvas->SetDrawColor(FColor(100, 255, 100));
+        Canvas->DrawText(SmallFont, TEXT("Download Complete!"), DlX + (DlW - 160) * 0.5f, DlY + EnterH + 10);
+
+        if (bEnterHover && WasMouseClicked())
+        {
+            StartTransition(ESBFlowScreen::Lobby, 1.0f);
+        }
+    }
+
+    // Skip button (bottom right) — skip download for testing
+    float SkipX = SW - 150;
+    float SkipY = SH - 45;
+    bool bSkipHover = IsMouseInRect(SkipX, SkipY, 130, 30);
+    Canvas->SetDrawColor(bSkipHover ? FColor(200, 200, 200) : FColor(100, 100, 110));
+    Canvas->DrawText(TinyFont, TEXT("SKIP >>"), SkipX + 35, SkipY + 8);
+    if (bSkipHover && WasMouseClicked())
+    {
+        StartTransition(ESBFlowScreen::Lobby, 0.6f);
+    }
+
+    // Footer
+    Canvas->SetDrawColor(FColor(50, 50, 60));
+    Canvas->DrawText(TinyFont, TEXT("Island Of Death Games | v1.0.0"), 20, SH - 25);
+}
+
+// ============================================================================
+// LOBBY SCREEN — BGMI-style
+// ============================================================================
+
+void ASBGameFlowHUD::DrawLobbyScreen()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+
+    // Dark cinematic background
+    DrawRect(FLinearColor(0.03f, 0.035f, 0.05f), 0, 0, SW, SH);
+
+    // Subtle gradient from center
+    DrawRect(FLinearColor(0.06f, 0.04f, 0.03f, 0.3f), SW * 0.2f, 0, SW * 0.6f, SH);
+
+    // Draw all lobby sections
+    DrawLobbyTopBar();
+    DrawLobbyGameLogo();
+    DrawLobbyLeftMenu();
+    DrawLobbyRightPanels();
+    DrawLobbyChatBar();
+    DrawLobbyBottomBar();
+    DrawLobbyStartButton();
+}
+
+void ASBGameFlowHUD::DrawLobbyTopBar()
+{
+    const float SW = Canvas->SizeX;
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
+
+    // Top bar background
+    DrawRect(FLinearColor(0.05f, 0.05f, 0.07f, 0.95f), 0, 0, SW, 55);
+    DrawRect(FLinearColor(0.7f, 0.5f, 0.1f, 0.3f), 0, 53, SW, 2); // gold accent
+
+    // Player info
     USBBackendSubsystem* Backend = nullptr;
     UGameInstance* GI = GetGameInstance();
     if (GI) Backend = GI->GetSubsystem<USBBackendSubsystem>();
 
-    FString PlayerName = TEXT("Player");
+    FString PlayerName = TEXT("PLAYER");
     int32 Level = 1;
     int32 Coins = 0;
+    int32 UC = 0;
 
     if (Backend)
     {
         const FSBPlayerProfile& P = Backend->GetProfile();
-        PlayerName = P.Username;
+        PlayerName = P.Username.ToUpper();
         Level = P.Level;
         Coins = P.Coins;
+        UC = P.Gems;
     }
 
+    // Avatar placeholder (square)
+    DrawRect(FLinearColor(0.15f, 0.15f, 0.2f), 10, 5, 45, 45);
+    DrawRoundedBorder(10, 5, 45, 45, FLinearColor(0.6f, 0.5f, 0.2f));
+
+    // Player name + level
     Canvas->SetDrawColor(FColor::White);
-    Canvas->DrawText(SmallFont, FString::Printf(TEXT("Lv.%d  %s"), Level, *PlayerName), 20.0f, 20.0f);
+    Canvas->DrawText(SmallFont, PlayerName, 65, 8);
 
-    // Coins (top right)
-    FString CoinStr = FString::Printf(TEXT("Coins: %d"), Coins);
-    Canvas->TextSize(SmallFont, CoinStr, TW, TH);
-    Canvas->SetDrawColor(FColor(255, 220, 50));
-    Canvas->DrawText(SmallFont, CoinStr, SW - TW - 20.0f, 20.0f);
-
-    // Center: Game Mode
-    FString ModeText = TEXT("ISLAND OF DEATH - TPP");
-    Canvas->TextSize(MedFont, ModeText, TW, TH);
-    Canvas->SetDrawColor(FColor::White);
-    Canvas->DrawText(MedFont, ModeText, (SW - TW) * 0.5f, SH * 0.15f);
-
-    // Map name
-    FString MapText = TEXT("Map: Island of Death");
-    Canvas->TextSize(SmallFont, MapText, TW, TH);
-    Canvas->SetDrawColor(FColor(180, 180, 180));
-    Canvas->DrawText(SmallFont, MapText, (SW - TW) * 0.5f, SH * 0.15f + 35.0f);
-
-    // Bot count selector
-    float SelectorY = SH * 0.35f;
+    FString LvStr = FString::Printf(TEXT("Lv.%d"), Level);
     Canvas->SetDrawColor(FColor(200, 200, 200));
-    Canvas->DrawText(SmallFont, TEXT("AI Bots:"), (SW - 200.0f) * 0.5f, SelectorY);
+    Canvas->DrawText(TinyFont, LvStr, 65, 28);
 
-    // Minus button
-    float MinusBtnX = (SW - 200.0f) * 0.5f + 100.0f;
-    DrawButton(MinusBtnX, SelectorY - 5.0f, 40.0f, 30.0f, TEXT("-"), FLinearColor(0.3f, 0.3f, 0.3f));
-    if (IsMouseInRect(MinusBtnX, SelectorY - 5.0f, 40.0f, 30.0f) && WasMouseClicked())
-    {
-        SelectedBotCount = FMath::Max(0, SelectedBotCount - 5);
-    }
+    // XP bar
+    DrawBar(65, 42, 100, 6, 0.65f, FLinearColor(0.8f, 0.6f, 0.1f), FLinearColor(0.15f, 0.15f, 0.2f));
 
-    // Count display
+    // VIP badge
+    DrawBadge(175, 10, TEXT("VIP 3"), FLinearColor(0.7f, 0.5f, 0.1f), FLinearColor(0, 0, 0));
+
+    // Currency (right side)
+    float CurrX = SW - 350;
+
+    // BP coins
+    DrawRect(FLinearColor(0.1f, 0.1f, 0.12f, 0.8f), CurrX, 12, 100, 28);
     Canvas->SetDrawColor(FColor(255, 220, 50));
-    FString BotStr = FString::Printf(TEXT("%d"), SelectedBotCount);
-    Canvas->DrawText(MedFont, BotStr, MinusBtnX + 55.0f, SelectorY - 5.0f);
+    Canvas->DrawText(TinyFont, TEXT("BP"), CurrX + 8, 17);
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(TinyFont, FString::Printf(TEXT("%d"), Coins), CurrX + 30, 17);
 
-    // Plus button
-    float PlusBtnX = MinusBtnX + 100.0f;
-    DrawButton(PlusBtnX, SelectorY - 5.0f, 40.0f, 30.0f, TEXT("+"), FLinearColor(0.3f, 0.3f, 0.3f));
-    if (IsMouseInRect(PlusBtnX, SelectorY - 5.0f, 40.0f, 30.0f) && WasMouseClicked())
+    // UC
+    DrawRect(FLinearColor(0.1f, 0.1f, 0.12f, 0.8f), CurrX + 110, 12, 100, 28);
+    Canvas->SetDrawColor(FColor(255, 200, 50));
+    Canvas->DrawText(TinyFont, TEXT("UC"), CurrX + 118, 17);
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(TinyFont, FString::Printf(TEXT("%d"), UC), CurrX + 140, 17);
+
+    // + button
+    DrawRect(FLinearColor(0.6f, 0.5f, 0.1f), CurrX + 220, 14, 24, 24);
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(TinyFont, TEXT("+"), CurrX + 228, 17);
+
+    // Icons (right side)
+    float IconX = SW - 100;
+    // Settings gear
+    Canvas->SetDrawColor(FColor(180, 180, 190));
+    Canvas->DrawText(TinyFont, TEXT("[S]"), IconX, 18);
+    // Ping
+    Canvas->SetDrawColor(CachedFPS >= 30 ? FColor(100, 255, 100) : FColor(255, 100, 100));
+    FString PingStr = TEXT("32ms");
+    APlayerController* PC = GetOwningPlayerController();
+    if (PC && PC->PlayerState)
     {
-        SelectedBotCount = FMath::Min(99, SelectedBotCount + 5);
+        PingStr = FString::Printf(TEXT("%.0fms"), PC->PlayerState->GetPingInMilliseconds());
+    }
+    Canvas->DrawText(TinyFont, PingStr, IconX + 35, 18);
+}
+
+void ASBGameFlowHUD::DrawLobbyGameLogo()
+{
+    const float SW = Canvas->SizeX;
+    UFont* LargeFont = GEngine->GetLargeFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
+
+    // Logo panel (top left, below top bar)
+    float LogoX = 10;
+    float LogoY = 65;
+    float LogoW = 200;
+    float LogoH = 120;
+
+    DrawPanel(LogoX, LogoY, LogoW, LogoH,
+        FLinearColor(0.05f, 0.04f, 0.03f, 0.85f), FLinearColor(0.6f, 0.4f, 0.1f, 0.5f));
+
+    // "ISLAND OF DEATH" in logo style
+    Canvas->SetDrawColor(FColor(230, 230, 235));
+    Canvas->DrawText(SmallFont, TEXT("ISLAND OF"), LogoX + 15, LogoY + 10);
+    Canvas->SetDrawColor(FColor(200, 30, 20));
+    Canvas->DrawText(MedFont, TEXT("DEATH"), LogoX + 15, LogoY + 30);
+
+    // Tagline
+    Canvas->SetDrawColor(FColor(180, 180, 180, 180));
+    Canvas->DrawText(TinyFont, TEXT("Some Spirits Don't seek"), LogoX + 15, LogoY + 65);
+    Canvas->DrawText(TinyFont, TEXT("revenge..."), LogoX + 15, LogoY + 80);
+    Canvas->SetDrawColor(FColor(200, 50, 30));
+    Canvas->DrawText(TinyFont, TEXT("they seek survival"), LogoX + 15, LogoY + 95);
+}
+
+void ASBGameFlowHUD::DrawLobbyLeftMenu()
+{
+    const float SH = Canvas->SizeY;
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
+
+    struct FMenuItem
+    {
+        FString Icon;
+        FString Label;
+        bool bHasNotif;
+        FString NotifText;
+    };
+
+    FMenuItem Items[] = {
+        { TEXT("[>]"),  TEXT("START"),     false, TEXT("") },
+        { TEXT("[W]"),  TEXT("LOADOUT"),   false, TEXT("") },
+        { TEXT("[C]"),  TEXT("CHARACTER"), false, TEXT("") },
+        { TEXT("[I]"),  TEXT("INVENTORY"), false, TEXT("") },
+        { TEXT("[M]"),  TEXT("MISSIONS"),  true,  TEXT("") },
+        { TEXT("[RP]"), TEXT("SEASON"),    true,  TEXT("") },
+        { TEXT("[CL]"), TEXT("CLAN"),      false, TEXT("") },
+        { TEXT("[E]"),  TEXT("EVENTS"),    true,  TEXT("NEW") },
+        { TEXT("[S]"),  TEXT("STORE"),     false, TEXT("") },
+    };
+
+    float MenuX = 10;
+    float MenuY = 195;
+    float ItemW = 200;
+    float ItemH = 36;
+    float ItemGap = 2;
+
+    for (int32 i = 0; i < 9; i++)
+    {
+        float IY = MenuY + i * (ItemH + ItemGap);
+        bool bSelected = (i == LobbyMenuIndex);
+        bool bHovered = IsMouseInRect(MenuX, IY, ItemW, ItemH);
+
+        // Background
+        if (bSelected)
+        {
+            DrawRect(FLinearColor(0.75f, 0.55f, 0.1f, 0.9f), MenuX, IY, ItemW, ItemH);
+        }
+        else if (bHovered)
+        {
+            DrawRect(FLinearColor(0.1f, 0.1f, 0.12f, 0.8f), MenuX, IY, ItemW, ItemH);
+        }
+        else
+        {
+            DrawRect(FLinearColor(0.05f, 0.05f, 0.07f, 0.6f), MenuX, IY, ItemW, ItemH);
+        }
+
+        // Left accent for selected
+        if (bSelected)
+        {
+            DrawRect(FLinearColor(0.9f, 0.7f, 0.1f), MenuX, IY, 3, ItemH);
+        }
+
+        // Icon
+        Canvas->SetDrawColor(bSelected ? FColor(30, 30, 30) : FColor(180, 180, 180));
+        Canvas->DrawText(TinyFont, Items[i].Icon, MenuX + 10, IY + 10);
+
+        // Label
+        Canvas->SetDrawColor(bSelected ? FColor(20, 20, 20) : FColor(220, 220, 220));
+        Canvas->DrawText(SmallFont, Items[i].Label, MenuX + 45, IY + 7);
+
+        // Notification badge
+        if (Items[i].bHasNotif)
+        {
+            if (Items[i].NotifText.Len() > 0)
+            {
+                DrawBadge(MenuX + ItemW - 50, IY + 8, Items[i].NotifText, FLinearColor(0.8f, 0.15f, 0.1f), FLinearColor(1, 1, 1));
+            }
+            else
+            {
+                // Red dot
+                DrawRect(FLinearColor(0.9f, 0.15f, 0.1f), MenuX + ItemW - 20, IY + 12, 8, 8);
+            }
+        }
+
+        if (bHovered && WasMouseClicked())
+        {
+            LobbyMenuIndex = i;
+        }
+    }
+}
+
+void ASBGameFlowHUD::DrawLobbyRightPanels()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
+
+    float PanelW = 250;
+    float PanelX = SW - PanelW - 10;
+
+    // ====== RANK PUSH PANEL ======
+    float RpY = 65;
+    float RpH = 80;
+    DrawPanel(PanelX, RpY, PanelW, RpH,
+        FLinearColor(0.06f, 0.04f, 0.03f, 0.9f), FLinearColor(0.5f, 0.3f, 0.1f, 0.4f));
+
+    Canvas->SetDrawColor(FColor(255, 220, 50));
+    Canvas->DrawText(SmallFont, TEXT("RANK PUSH"), PanelX + 15, RpY + 10);
+    Canvas->SetDrawColor(FColor(200, 50, 30));
+    Canvas->DrawText(TinyFont, TEXT("SEASON 12"), PanelX + 15, RpY + 30);
+
+    // RP level
+    Canvas->SetDrawColor(FColor(255, 220, 50));
+    Canvas->DrawText(TinyFont, TEXT("RP"), PanelX + 15, RpY + 52);
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(MedFont, TEXT("50"), PanelX + 40, RpY + 45);
+    DrawBar(PanelX + 80, RpY + 55, 100, 8, 0.8f,
+        FLinearColor(0.8f, 0.6f, 0.1f), FLinearColor(0.15f, 0.15f, 0.2f));
+    Canvas->SetDrawColor(FColor(150, 150, 150));
+    Canvas->DrawText(TinyFont, TEXT("80/100"), PanelX + 185, RpY + 52);
+
+    // ====== DAILY SPECIAL BUNDLE ======
+    float DsY = RpY + RpH + 10;
+    float DsH = 80;
+    DrawPanel(PanelX, DsY, PanelW, DsH,
+        FLinearColor(0.05f, 0.03f, 0.05f, 0.9f), FLinearColor(0.4f, 0.15f, 0.3f, 0.4f));
+
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(SmallFont, TEXT("DAILY SPECIAL BUNDLE"), PanelX + 15, DsY + 10);
+    DrawBadge(PanelX + PanelW - 55, DsY + 10, TEXT("-70%"), FLinearColor(0.8f, 0.15f, 0.1f), FLinearColor(1, 1, 1));
+
+    // Character slots
+    for (int32 i = 0; i < 3; i++)
+    {
+        float SlotX = PanelX + 15 + i * 55;
+        DrawRect(FLinearColor(0.1f, 0.1f, 0.12f), SlotX, DsY + 38, 45, 35);
+        DrawRoundedBorder(SlotX, DsY + 38, 45, 35, FLinearColor(0.3f, 0.3f, 0.35f));
     }
 
-    // Squad slots (bottom center)
-    float SlotY = SH * 0.55f;
-    float SlotSize = 70.0f;
-    float SlotGap = 15.0f;
-    float SlotsStartX = (SW - (SlotSize * 4 + SlotGap * 3)) * 0.5f;
+    // ====== EVENTS PANEL ======
+    float EvY = DsY + DsH + 10;
+    float EvH = 70;
+    DrawPanel(PanelX, EvY, PanelW, EvH,
+        FLinearColor(0.04f, 0.04f, 0.06f, 0.9f), FLinearColor(0.3f, 0.15f, 0.1f, 0.4f));
 
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(SmallFont, TEXT("EVENTS"), PanelX + 15, EvY + 8);
+    DrawBadge(PanelX + PanelW - 50, EvY + 8, TEXT("HOT"), FLinearColor(0.8f, 0.15f, 0.1f), FLinearColor(1, 1, 1));
+
+    Canvas->SetDrawColor(FColor(200, 50, 30));
+    Canvas->DrawText(SmallFont, TEXT("ZOMBIE SURVIVAL"), PanelX + 15, EvY + 32);
+    Canvas->SetDrawColor(FColor(220, 50, 30));
+    Canvas->DrawText(TinyFont, TEXT("LIVE NOW"), PanelX + 15, EvY + 50);
+
+    // ====== BATTLE ROYALE MODE PANEL ======
+    float BrY = EvY + EvH + 10;
+    float BrH = 70;
+    DrawPanel(PanelX, BrY, PanelW, BrH,
+        FLinearColor(0.04f, 0.04f, 0.06f, 0.9f), FLinearColor(0.2f, 0.2f, 0.25f, 0.4f));
+
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(SmallFont, TEXT("BATTLE ROYALE"), PanelX + 15, BrY + 10);
+    Canvas->SetDrawColor(FColor(180, 180, 180));
+    Canvas->DrawText(TinyFont, TEXT("CLASSIC"), PanelX + 15, BrY + 30);
+
+    // TPP + Squad info
+    Canvas->SetDrawColor(FColor(150, 150, 160));
+    Canvas->DrawText(TinyFont, TEXT("TPP"), PanelX + 15, BrY + 48);
+
+    // Squad size selector
+    FString SquadStr = TEXT("Solo");
+    if (SelectedSquadSize == 2) SquadStr = TEXT("Duo");
+    else if (SelectedSquadSize == 4) SquadStr = TEXT("Squad");
+    Canvas->SetDrawColor(FColor::White);
+    Canvas->DrawText(TinyFont, SquadStr, PanelX + 60, BrY + 48);
+
+    // Bot count
+    Canvas->SetDrawColor(FColor(255, 220, 50));
+    Canvas->DrawText(TinyFont, FString::Printf(TEXT("Bots: %d"), SelectedBotCount), PanelX + 130, BrY + 48);
+}
+
+void ASBGameFlowHUD::DrawLobbyChatBar()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    UFont* TinyFont = GEngine->GetTinyFont();
+
+    float ChatY = SH - 80;
+    float ChatW = SW * 0.55f;
+    float ChatH = 28;
+
+    DrawRect(FLinearColor(0.04f, 0.04f, 0.06f, 0.8f), 10, ChatY, ChatW, ChatH);
+    DrawRoundedBorder(10, ChatY, ChatW, ChatH, FLinearColor(0.2f, 0.2f, 0.25f, 0.4f));
+
+    Canvas->SetDrawColor(FColor(100, 100, 110));
+    Canvas->DrawText(TinyFont, TEXT("[...]"), 18, ChatY + 7);
+
+    Canvas->SetDrawColor(FColor(180, 180, 180));
+    Canvas->DrawText(TinyFont, ChatMessage, 45, ChatY + 7);
+}
+
+void ASBGameFlowHUD::DrawLobbyBottomBar()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    UFont* TinyFont = GEngine->GetTinyFont();
+    UFont* SmallFont = GEngine->GetSmallFont();
+
+    // Bottom bar
+    float BarY = SH - 45;
+    DrawRect(FLinearColor(0.04f, 0.04f, 0.06f, 0.9f), 0, BarY, SW, 45);
+    DrawRect(FLinearColor(0.3f, 0.25f, 0.1f, 0.3f), 0, BarY, SW, 1);
+
+    // Tab buttons
+    struct FTab { FString Icon; FString Label; };
+    FTab Tabs[] = {
+        { TEXT("[R]"), TEXT("RANK") },
+        { TEXT("[T]"), TEXT("ACHIEVEMENTS") },
+        { TEXT("[W]"), TEXT("WORKSHOP") },
+        { TEXT("[P]"), TEXT("SOCIAL") },
+    };
+
+    float TabX = 20;
     for (int32 i = 0; i < 4; i++)
     {
-        float SX = SlotsStartX + i * (SlotSize + SlotGap);
-        FLinearColor SlotColor = (i == 0) ? FLinearColor(0.2f, 0.6f, 0.3f, 0.8f) : FLinearColor(0.15f, 0.15f, 0.2f, 0.6f);
-        DrawRect(SlotColor, SX, SlotY, SlotSize, SlotSize);
+        float TabW = 110;
+        bool bHover = IsMouseInRect(TabX, BarY + 5, TabW, 35);
 
-        // Slot border
-        DrawRect(FLinearColor(0.4f, 0.4f, 0.5f), SX, SlotY, SlotSize, 2);
-        DrawRect(FLinearColor(0.4f, 0.4f, 0.5f), SX, SlotY + SlotSize - 2, SlotSize, 2);
-        DrawRect(FLinearColor(0.4f, 0.4f, 0.5f), SX, SlotY, 2, SlotSize);
-        DrawRect(FLinearColor(0.4f, 0.4f, 0.5f), SX + SlotSize - 2, SlotY, 2, SlotSize);
+        Canvas->SetDrawColor(bHover ? FColor(255, 220, 50) : FColor(160, 160, 170));
+        Canvas->DrawText(TinyFont, Tabs[i].Icon, TabX, BarY + 8);
+        Canvas->DrawText(TinyFont, Tabs[i].Label, TabX + 25, BarY + 8);
 
-        FString SlotLabel = (i == 0) ? TEXT("YOU") : FString::Printf(TEXT("Slot %d"), i + 1);
-        Canvas->TextSize(TinyFont, SlotLabel, TW, TH);
-        Canvas->SetDrawColor((i == 0) ? FColor::White : FColor(100, 100, 100));
-        Canvas->DrawText(TinyFont, SlotLabel, SX + (SlotSize - TW) * 0.5f, SlotY + SlotSize + 5.0f);
+        TabX += TabW + 10;
     }
 
-    // START MATCH button (big, bottom)
-    float StartBtnW = 350.0f;
-    float StartBtnH = 60.0f;
-    float StartBtnX = (SW - StartBtnW) * 0.5f;
-    float StartBtnY = SH * 0.80f;
+    // FIRST TOP-UP
+    Canvas->SetDrawColor(FColor(255, 220, 50));
+    Canvas->DrawText(TinyFont, TEXT("FIRST TOP-UP"), SW * 0.5f, BarY + 15);
+}
 
-    DrawButton(StartBtnX, StartBtnY, StartBtnW, StartBtnH, TEXT("START MATCH"), FLinearColor(0.9f, 0.6f, 0.1f));
+void ASBGameFlowHUD::DrawLobbyStartButton()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    UFont* LargeFont = GEngine->GetLargeFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    float TW, TH;
 
-    if (IsMouseInRect(StartBtnX, StartBtnY, StartBtnW, StartBtnH) && WasMouseClicked())
+    // Big START button (bottom right)
+    float BtnW = 200;
+    float BtnH = 65;
+    float BtnX = SW - BtnW - 15;
+    float BtnY = SH - BtnH - 55;
+
+    bool bHovered = IsMouseInRect(BtnX, BtnY, BtnW, BtnH);
+
+    // Yellow/gold gradient button
+    FLinearColor BtnColor = bHovered
+        ? FLinearColor(0.95f, 0.75f, 0.15f)
+        : FLinearColor(0.85f, 0.62f, 0.08f);
+
+    DrawRect(BtnColor, BtnX, BtnY, BtnW, BtnH);
+
+    // Darker bottom half for depth
+    DrawRect(FLinearColor(0, 0, 0, 0.15f), BtnX, BtnY + BtnH * 0.5f, BtnW, BtnH * 0.5f);
+
+    // Border
+    DrawRoundedBorder(BtnX, BtnY, BtnW, BtnH,
+        FLinearColor(0.9f, 0.7f, 0.2f), 2);
+
+    // Highlight on top
+    DrawRect(FLinearColor(1, 1, 1, 0.2f), BtnX + 2, BtnY + 2, BtnW - 4, 2);
+
+    // "START" text
+    FString StartStr = TEXT("START");
+    Canvas->TextSize(MedFont, StartStr, TW, TH);
+    Canvas->SetDrawColor(FColor(20, 15, 5));
+    Canvas->DrawText(MedFont, StartStr, BtnX + (BtnW - TW) * 0.5f, BtnY + (BtnH - TH) * 0.5f);
+
+    // Arrow
+    Canvas->DrawText(MedFont, TEXT(">"), BtnX + BtnW - 35, BtnY + (BtnH - TH) * 0.5f);
+
+    if (bHovered && WasMouseClicked())
     {
         StartTransition(ESBFlowScreen::InGame, 1.2f);
     }
-
-    // Footer
-    Canvas->SetDrawColor(FColor(60, 60, 60));
-    Canvas->DrawText(TinyFont, TEXT("Solo | TPP | Asia"), 20.0f, SH - 25.0f);
-
-    Canvas->TextSize(TinyFont, TEXT("v1.0.0"), TW, TH);
-    Canvas->DrawText(TinyFont, TEXT("v1.0.0"), SW - TW - 20.0f, SH - 25.0f);
 }
 
 // ============================================================================
-// IN-GAME HUD (simplified from SBInGameHUD)
+// IN-GAME HUD
 // ============================================================================
 
 void ASBGameFlowHUD::DrawInGameHUD()
@@ -863,11 +1138,10 @@ void ASBGameFlowHUD::DrawHealthShieldBoost()
     const float SW = Canvas->SizeX;
     const float SH = Canvas->SizeY;
     const float BarW = SW * 0.22f;
-    const float BarH = 16.0f;
-    float Y = SH - 30.0f;
+    const float BarH = 16;
+    float Y = SH - 30;
 
-    float Health = 100.0f, MaxHealth = 100.0f, Shield = 0.0f, MaxShield = 150.0f;
-
+    float Health = 100, MaxHealth = 100, Shield = 0, MaxShield = 150;
     ASBCharacterBase* Char = GetPlayerCharacter();
     if (Char)
     {
@@ -882,14 +1156,12 @@ void ASBGameFlowHUD::DrawHealthShieldBoost()
     }
 
     UFont* Font = GEngine->GetTinyFont();
-
     DrawBar(20, Y, BarW, BarH, MaxHealth > 0 ? Health / MaxHealth : 0,
         FLinearColor(0.15f, 0.85f, 0.25f, 0.9f), FLinearColor(0.1f, 0.1f, 0.1f, 0.7f));
     Canvas->SetDrawColor(FColor::White);
     Canvas->DrawText(Font, FString::Printf(TEXT("%.0f"), Health), 24, Y + 1);
 
     Y -= BarH + 4;
-
     DrawBar(20, Y, BarW, BarH, MaxShield > 0 ? Shield / MaxShield : 0,
         FLinearColor(0.2f, 0.5f, 1.0f, 0.9f), FLinearColor(0.1f, 0.1f, 0.1f, 0.7f));
     Canvas->SetDrawColor(FColor(100, 180, 255));
@@ -904,8 +1176,7 @@ void ASBGameFlowHUD::DrawWeaponAmmo()
     UFont* TinyFont = GEngine->GetTinyFont();
 
     FString AmmoStr = TEXT("--/--");
-    FString WeaponName = TEXT("");
-    FString FireMode = TEXT("");
+    FString WeaponName, FireMode;
 
     ASBCharacterBase* Char = GetPlayerCharacter();
     if (Char && Char->WeaponComponent)
@@ -925,8 +1196,8 @@ void ASBGameFlowHUD::DrawWeaponAmmo()
     }
 
     float TW, TH;
-    float X = SW - 20.0f;
-    float Y = SH - 30.0f;
+    float X = SW - 20;
+    float Y = SH - 30;
 
     Canvas->SetDrawColor(FColor::White);
     Canvas->TextSize(SmallFont, AmmoStr, TW, TH);
@@ -970,17 +1241,16 @@ void ASBGameFlowHUD::DrawCompass()
     static const TPair<float, FString> Dirs[] = {
         {0, TEXT("N")}, {90, TEXT("E")}, {180, TEXT("S")}, {270, TEXT("W")}
     };
-
     for (const auto& D : Dirs)
     {
         float Delta = FMath::FindDeltaAngleDegrees(Yaw, D.Key);
         float SX = CX + (Delta / 180.0f) * HalfW;
         if (SX > CX - HalfW && SX < CX + HalfW)
         {
-            float TW, TH;
-            Canvas->TextSize(Font, D.Value, TW, TH);
+            float TW2, TH2;
+            Canvas->TextSize(Font, D.Value, TW2, TH2);
             Canvas->SetDrawColor(FColor::White);
-            Canvas->DrawText(Font, D.Value, SX - TW * 0.5f, 30);
+            Canvas->DrawText(Font, D.Value, SX - TW2 * 0.5f, 30);
         }
     }
 
@@ -1029,7 +1299,7 @@ void ASBGameFlowHUD::DrawFPSPing()
 }
 
 // ============================================================================
-// Helpers
+// HELPERS
 // ============================================================================
 
 void ASBGameFlowHUD::DrawBar(float X, float Y, float W, float H, float Pct, FLinearColor Fill, FLinearColor Bg)
@@ -1041,9 +1311,7 @@ void ASBGameFlowHUD::DrawBar(float X, float Y, float W, float H, float Pct, FLin
 void ASBGameFlowHUD::DrawButton(float X, float Y, float W, float H, const FString& Text, FLinearColor Color)
 {
     bool bHovered = IsMouseInRect(X, Y, W, H);
-    FLinearColor BtnColor = bHovered ? Color * 1.3f : Color;
-
-    DrawRect(BtnColor, X, Y, W, H);
+    DrawRect(bHovered ? Color * 1.3f : Color, X, Y, W, H);
     DrawRect(FLinearColor(1, 1, 1, 0.3f), X, Y, W, 2);
 
     UFont* Font = GEngine->GetSmallFont();
@@ -1053,11 +1321,92 @@ void ASBGameFlowHUD::DrawButton(float X, float Y, float W, float H, const FStrin
     Canvas->DrawText(Font, Text, X + (W - TW) * 0.5f, Y + (H - TH) * 0.5f);
 }
 
+void ASBGameFlowHUD::DrawLoginButton(float X, float Y, float W, float H,
+    const FString& IconText, const FString& Label,
+    FLinearColor BgColor, FLinearColor BorderColor, FLinearColor TextColor)
+{
+    bool bHovered = IsMouseInRect(X, Y, W, H);
+    DrawRect(bHovered ? BgColor * 1.15f : BgColor, X, Y, W, H);
+    DrawRoundedBorder(X, Y, W, H, BorderColor, bHovered ? 2.0f : 1.0f);
+    DrawRect(FLinearColor(1, 1, 1, 0.08f), X + 1, Y + 1, W - 2, 1);
+
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    float TW, TH;
+
+    uint8 TR = (uint8)(TextColor.R * 255);
+    uint8 TG = (uint8)(TextColor.G * 255);
+    uint8 TB = (uint8)(TextColor.B * 255);
+
+    Canvas->SetDrawColor(FColor(TR, TG, TB));
+    Canvas->DrawText(MedFont, IconText, X + 20, Y + (H - 20) * 0.5f);
+    DrawRect(FLinearColor(TextColor.R, TextColor.G, TextColor.B, 0.2f), X + 55, Y + 8, 1, H - 16);
+
+    Canvas->TextSize(SmallFont, Label, TW, TH);
+    Canvas->SetDrawColor(FColor(TR, TG, TB));
+    Canvas->DrawText(SmallFont, Label, X + 60 + (W - 60 - TW) * 0.5f, Y + (H - TH) * 0.5f);
+}
+
+void ASBGameFlowHUD::DrawRoundedBorder(float X, float Y, float W, float H, FLinearColor Color, float Thickness)
+{
+    DrawRect(Color, X, Y, W, Thickness);
+    DrawRect(Color, X, Y + H - Thickness, W, Thickness);
+    DrawRect(Color, X, Y, Thickness, H);
+    DrawRect(Color, X + W - Thickness, Y, Thickness, H);
+}
+
+void ASBGameFlowHUD::DrawCornerAccents(float SW, float SH, float Size, FLinearColor Color)
+{
+    float T = 2.0f;
+    float Ins = 15.0f;
+    DrawRect(Color, Ins, Ins, Size, T);
+    DrawRect(Color, Ins, Ins, T, Size);
+    DrawRect(Color, SW - Ins - Size, Ins, Size, T);
+    DrawRect(Color, SW - Ins - T, Ins, T, Size);
+    DrawRect(Color, Ins, SH - Ins - T, Size, T);
+    DrawRect(Color, Ins, SH - Ins - Size, T, Size);
+    DrawRect(Color, SW - Ins - Size, SH - Ins - T, Size, T);
+    DrawRect(Color, SW - Ins - T, SH - Ins - Size, T, Size);
+}
+
+void ASBGameFlowHUD::DrawSeparatorLine(float X, float Y, float W, const FString& Text)
+{
+    UFont* TinyFont = GEngine->GetTinyFont();
+    float TW, TH;
+    Canvas->TextSize(TinyFont, Text, TW, TH);
+    float TextX = X + (W - TW) * 0.5f;
+    float LineY2 = Y + TH * 0.5f;
+    float Gap = 10;
+    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), X, LineY2, TextX - X - Gap, 1);
+    DrawRect(FLinearColor(0.25f, 0.15f, 0.1f, 0.5f), TextX + TW + Gap, LineY2, X + W - TextX - TW - Gap, 1);
+    Canvas->SetDrawColor(FColor(120, 100, 80));
+    Canvas->DrawText(TinyFont, Text, TextX, Y);
+}
+
+void ASBGameFlowHUD::DrawPanel(float X, float Y, float W, float H, FLinearColor Bg, FLinearColor Border)
+{
+    DrawRect(Bg, X, Y, W, H);
+    DrawRoundedBorder(X, Y, W, H, Border);
+}
+
+void ASBGameFlowHUD::DrawBadge(float X, float Y, const FString& Text, FLinearColor Bg, FLinearColor TextCol)
+{
+    UFont* TinyFont = GEngine->GetTinyFont();
+    float TW, TH;
+    Canvas->TextSize(TinyFont, Text, TW, TH);
+    float Pad = 6;
+    DrawRect(Bg, X, Y, TW + Pad * 2, TH + 4);
+    Canvas->SetDrawColor(FColor(
+        (uint8)(TextCol.R * 255),
+        (uint8)(TextCol.G * 255),
+        (uint8)(TextCol.B * 255)));
+    Canvas->DrawText(TinyFont, Text, X + Pad, Y + 2);
+}
+
 bool ASBGameFlowHUD::IsMouseInRect(float X, float Y, float W, float H) const
 {
     APlayerController* PC = GetOwningPlayerController();
     if (!PC) return false;
-
     float MX, MY;
     PC->GetMousePosition(MX, MY);
     return (MX >= X && MX <= X + W && MY >= Y && MY <= Y + H);

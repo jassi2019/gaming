@@ -783,16 +783,8 @@ void ASBGameFlowHUD::DrawLoadingScreen()
 
 void ASBGameFlowHUD::DrawLobbyScreen()
 {
-    const float SW = Canvas->SizeX;
-    const float SH = Canvas->SizeY;
-
-    // Dark cinematic background
-    DrawRect(FLinearColor(0.03f, 0.035f, 0.05f), 0, 0, SW, SH);
-
-    // Subtle gradient from center
-    DrawRect(FLinearColor(0.06f, 0.04f, 0.03f, 0.3f), SW * 0.2f, 0, SW * 0.6f, SH);
-
-    // Draw all lobby sections
+    DrawLobbyBackground();
+    DrawLobbyCenterScene();
     DrawLobbyTopBar();
     DrawLobbyGameLogo();
     DrawLobbyLeftMenu();
@@ -800,6 +792,236 @@ void ASBGameFlowHUD::DrawLobbyScreen()
     DrawLobbyChatBar();
     DrawLobbyBottomBar();
     DrawLobbyStartButton();
+}
+
+void ASBGameFlowHUD::DrawLobbyBackground()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    float T = ScreenTimer;
+
+    // Base: dark navy gradient (top darker, bottom slightly warmer)
+    for (int32 i = 0; i < 20; i++)
+    {
+        float Y = i * (SH / 20.0f);
+        float t = (float)i / 19.0f;
+        float R = FMath::Lerp(0.02f, 0.06f, t);
+        float G = FMath::Lerp(0.025f, 0.04f, t);
+        float B = FMath::Lerp(0.04f, 0.06f, t);
+        DrawRect(FLinearColor(R, G, B), 0, Y, SW, SH / 20.0f + 1);
+    }
+
+    // Warm center glow (where character would stand)
+    float GlowCX = SW * 0.5f;
+    float GlowCY = SH * 0.5f;
+    float GlowW = SW * 0.4f;
+    float GlowH = SH * 0.6f;
+    float GlowPulse = 0.8f + 0.2f * FMath::Sin(T * 0.8f);
+    DrawRect(FLinearColor(0.08f, 0.04f, 0.02f, 0.15f * GlowPulse),
+        GlowCX - GlowW * 0.5f, GlowCY - GlowH * 0.5f, GlowW, GlowH);
+
+    // Red/orange atmosphere at horizon (bottom third)
+    DrawRect(FLinearColor(0.12f, 0.04f, 0.02f, 0.08f), 0, SH * 0.55f, SW, SH * 0.15f);
+    DrawRect(FLinearColor(0.08f, 0.03f, 0.01f, 0.06f), 0, SH * 0.7f, SW, SH * 0.3f);
+
+    // Animated fog/mist particles
+    for (int32 i = 0; i < 25; i++)
+    {
+        float Seed = i * 97.3f;
+        float PX = FMath::Fmod(Seed * 5.7f + T * (8 + i * 2), SW);
+        float PY = SH * 0.3f + FMath::Sin(T * 0.5f + Seed) * SH * 0.2f;
+        float PS = 2.0f + FMath::Sin(Seed) * 1.5f;
+        float PA = 0.06f + 0.04f * FMath::Sin(T * 1.5f + Seed);
+        DrawRect(FLinearColor(0.5f, 0.35f, 0.2f, PA), PX, PY, PS, PS);
+    }
+
+    // Distant parachute silhouettes (top area)
+    for (int32 i = 0; i < 4; i++)
+    {
+        float Seed = i * 200.0f;
+        float ParaX = SW * (0.25f + i * 0.15f) + FMath::Sin(T * 0.3f + Seed) * 15.0f;
+        float ParaY = 80 + i * 30 + FMath::Sin(T * 0.5f + Seed) * 8.0f;
+        float PA = 0.08f - i * 0.015f;
+        // Parachute canopy (small arc)
+        DrawRect(FLinearColor(0.3f, 0.3f, 0.35f, PA), ParaX - 4, ParaY, 8, 3);
+        // Line
+        DrawRect(FLinearColor(0.3f, 0.3f, 0.35f, PA * 0.7f), ParaX, ParaY + 3, 1, 6);
+        // Figure
+        DrawRect(FLinearColor(0.3f, 0.3f, 0.35f, PA * 0.5f), ParaX - 1, ParaY + 9, 2, 3);
+    }
+
+    // Vignette edges
+    float VigW = SW * 0.08f;
+    DrawRect(FLinearColor(0, 0, 0, 0.5f), 0, 0, VigW, SH);
+    DrawRect(FLinearColor(0, 0, 0, 0.5f), SW - VigW, 0, VigW, SH);
+    DrawRect(FLinearColor(0, 0, 0, 0.3f), 0, 0, SW, 20);
+    DrawRect(FLinearColor(0, 0, 0, 0.4f), 0, SH - 50, SW, 50);
+
+    // Subtle grid floor lines (bottom area)
+    float FloorY = SH * 0.7f;
+    for (int32 i = 0; i < 12; i++)
+    {
+        float LX = SW * 0.2f + i * (SW * 0.05f);
+        float LAlpha = 0.04f * (1.0f - FMath::Abs(i - 6.0f) / 6.0f);
+        DrawRect(FLinearColor(0.3f, 0.25f, 0.15f, LAlpha), LX, FloorY, 1, SH - FloorY - 50);
+    }
+    // Horizontal floor lines
+    for (int32 i = 0; i < 5; i++)
+    {
+        float LY = FloorY + i * 25;
+        float LAlpha = 0.03f * (1.0f - (float)i / 5.0f);
+        DrawRect(FLinearColor(0.3f, 0.25f, 0.15f, LAlpha), SW * 0.2f, LY, SW * 0.6f, 1);
+    }
+}
+
+void ASBGameFlowHUD::DrawLobbyCenterScene()
+{
+    const float SW = Canvas->SizeX;
+    const float SH = Canvas->SizeY;
+    float T = ScreenTimer;
+
+    UFont* LargeFont = GEngine->GetLargeFont();
+    UFont* MedFont = GEngine->GetMediumFont();
+    UFont* SmallFont = GEngine->GetSmallFont();
+    UFont* TinyFont = GEngine->GetTinyFont();
+    float TW, TH;
+
+    float CX = SW * 0.5f;
+
+    // === Big "ISLAND OF DEATH" text in center ===
+    // Glow behind text
+    float LogoGlow = 0.7f + 0.3f * FMath::Sin(T * 1.5f);
+    DrawRect(FLinearColor(0.4f, 0.1f, 0.05f, 0.06f * LogoGlow),
+        CX - 200, SH * 0.3f - 20, 400, 120);
+
+    // "ISLAND" — large white
+    FString IslandStr = TEXT("ISLAND");
+    Canvas->TextSize(LargeFont, IslandStr, TW, TH);
+    // Shadow
+    Canvas->SetDrawColor(FColor(0, 0, 0, 120));
+    Canvas->DrawText(LargeFont, IslandStr, CX - TW * 0.5f + 2, SH * 0.32f + 2);
+    // Main
+    Canvas->SetDrawColor(FColor(230, 230, 235));
+    Canvas->DrawText(LargeFont, IslandStr, CX - TW * 0.5f, SH * 0.32f);
+
+    // "OF" — medium gray
+    FString OfStr = TEXT("OF");
+    Canvas->TextSize(MedFont, OfStr, TW, TH);
+    Canvas->SetDrawColor(FColor(180, 180, 185, 200));
+    Canvas->DrawText(MedFont, OfStr, CX - TW * 0.5f, SH * 0.32f + 35);
+
+    // "DEATH" — large blood red with glow
+    FString DeathStr = TEXT("DEATH");
+    Canvas->TextSize(LargeFont, DeathStr, TW, TH);
+    // Red glow
+    DrawRect(FLinearColor(0.6f, 0.08f, 0.03f, 0.1f * LogoGlow),
+        CX - TW * 0.6f, SH * 0.32f + 48, TW * 1.2f, TH + 10);
+    // Shadow
+    Canvas->SetDrawColor(FColor(80, 0, 0, 150));
+    Canvas->DrawText(LargeFont, DeathStr, CX - TW * 0.5f + 2, SH * 0.32f + 52);
+    // Main
+    Canvas->SetDrawColor(FColor(200, 30, 20));
+    Canvas->DrawText(LargeFont, DeathStr, CX - TW * 0.5f, SH * 0.32f + 50);
+
+    // Accent line under DEATH
+    float LineW = 180.0f;
+    float LineY = SH * 0.32f + 85;
+    DrawRect(FLinearColor(0.6f, 0.1f, 0.05f, 0.4f), CX - LineW * 0.5f, LineY, LineW, 2);
+    // Line glow
+    DrawRect(FLinearColor(0.6f, 0.1f, 0.05f, 0.1f), CX - LineW * 0.6f, LineY - 2, LineW * 1.2f, 6);
+
+    // Tagline
+    Canvas->SetDrawColor(FColor(180, 175, 170, 180));
+    FString Tag = TEXT("Some Spirits Don't seek revenge...");
+    Canvas->TextSize(TinyFont, Tag, TW, TH);
+    Canvas->DrawText(TinyFont, Tag, CX - TW * 0.5f - 30, LineY + 12);
+
+    Canvas->SetDrawColor(FColor(220, 50, 30, 220));
+    FString Tag2 = TEXT("they seek survival");
+    Canvas->DrawText(TinyFont, Tag2, CX + TW * 0.5f - 28, LineY + 12);
+
+    // === Character silhouette (soldier standing) ===
+    float CharX = CX;
+    float CharBaseY = SH * 0.72f;
+
+    // Body shadow on ground
+    DrawRect(FLinearColor(0, 0, 0, 0.15f), CharX - 25, CharBaseY, 50, 6);
+
+    // Legs
+    DrawRect(FLinearColor(0.12f, 0.12f, 0.14f), CharX - 8, CharBaseY - 65, 6, 65);
+    DrawRect(FLinearColor(0.12f, 0.12f, 0.14f), CharX + 2, CharBaseY - 65, 6, 65);
+
+    // Torso
+    DrawRect(FLinearColor(0.14f, 0.14f, 0.16f), CharX - 12, CharBaseY - 120, 24, 55);
+
+    // Vest/armor
+    DrawRect(FLinearColor(0.10f, 0.10f, 0.12f), CharX - 10, CharBaseY - 115, 20, 35);
+
+    // Arms
+    DrawRect(FLinearColor(0.13f, 0.13f, 0.15f), CharX - 18, CharBaseY - 115, 6, 45);
+    DrawRect(FLinearColor(0.13f, 0.13f, 0.15f), CharX + 12, CharBaseY - 115, 6, 45);
+
+    // Weapon (held in right hand, angled)
+    DrawRect(FLinearColor(0.08f, 0.08f, 0.10f), CharX + 15, CharBaseY - 100, 3, 50);
+
+    // Head
+    DrawRect(FLinearColor(0.15f, 0.15f, 0.17f), CharX - 6, CharBaseY - 135, 12, 15);
+
+    // Helmet
+    DrawRect(FLinearColor(0.10f, 0.10f, 0.12f), CharX - 7, CharBaseY - 140, 14, 8);
+
+    // Backpack
+    DrawRect(FLinearColor(0.09f, 0.09f, 0.11f), CharX - 16, CharBaseY - 118, 6, 30);
+
+    // Character highlight rim (subtle edge light)
+    DrawRect(FLinearColor(0.3f, 0.2f, 0.1f, 0.15f), CharX + 12, CharBaseY - 135, 2, 70);
+
+    // === C-130 Aircraft silhouette (top) ===
+    float PlaneX = SW * 0.35f + FMath::Sin(T * 0.2f) * 30;
+    float PlaneY = 85;
+    // Fuselage
+    DrawRect(FLinearColor(0.2f, 0.2f, 0.22f, 0.12f), PlaneX, PlaneY, 40, 6);
+    // Wings
+    DrawRect(FLinearColor(0.2f, 0.2f, 0.22f, 0.10f), PlaneX + 10, PlaneY - 4, 20, 3);
+    // Tail
+    DrawRect(FLinearColor(0.2f, 0.2f, 0.22f, 0.08f), PlaneX - 3, PlaneY - 6, 6, 8);
+
+    // === Distant buildings/structures on horizon ===
+    float HorizonY = SH * 0.58f;
+
+    // Left tower (lighthouse)
+    DrawRect(FLinearColor(0.08f, 0.08f, 0.10f, 0.15f), SW * 0.22f, HorizonY - 50, 6, 50);
+    DrawRect(FLinearColor(0.7f, 0.2f, 0.1f, 0.1f + 0.05f * FMath::Sin(T * 3)), SW * 0.22f - 1, HorizonY - 53, 8, 4); // blinking light
+
+    // Center temple/skull mountain
+    float MtnX = CX;
+    float MtnY = HorizonY - 30;
+    // Mountain base
+    for (int32 i = 0; i < 8; i++)
+    {
+        float MW = 80 - i * 8;
+        float MY = MtnY + i * 4;
+        DrawRect(FLinearColor(0.06f, 0.06f, 0.08f, 0.12f - i * 0.01f), MtnX - MW * 0.5f, MY, MW, 4);
+    }
+
+    // Right structures
+    DrawRect(FLinearColor(0.07f, 0.07f, 0.09f, 0.12f), SW * 0.72f, HorizonY - 20, 15, 20);
+    DrawRect(FLinearColor(0.07f, 0.07f, 0.09f, 0.10f), SW * 0.75f, HorizonY - 30, 10, 30);
+    DrawRect(FLinearColor(0.07f, 0.07f, 0.09f, 0.08f), SW * 0.78f, HorizonY - 15, 12, 15);
+
+    // Palm trees (left and right)
+    auto DrawPalmTree = [this](float X, float Y, float A)
+    {
+        DrawRect(FLinearColor(0.06f, 0.06f, 0.08f, A), X, Y, 3, 30);
+        DrawRect(FLinearColor(0.05f, 0.07f, 0.04f, A * 0.8f), X - 10, Y - 5, 12, 6);
+        DrawRect(FLinearColor(0.05f, 0.07f, 0.04f, A * 0.7f), X + 1, Y - 3, 10, 5);
+    };
+    DrawPalmTree(SW * 0.18f, HorizonY - 25, 0.1f);
+    DrawPalmTree(SW * 0.82f, HorizonY - 20, 0.08f);
+    DrawPalmTree(SW * 0.15f, HorizonY - 15, 0.06f);
+
+    // Water/ocean line
+    DrawRect(FLinearColor(0.1f, 0.15f, 0.2f, 0.06f), SW * 0.1f, HorizonY + 5, SW * 0.8f, 2);
 }
 
 void ASBGameFlowHUD::DrawLobbyTopBar()

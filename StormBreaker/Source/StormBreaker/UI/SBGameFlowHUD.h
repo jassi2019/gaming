@@ -91,6 +91,8 @@ private:
     void DrawFPSPing();
 
     // --- Lobby sub-draws ---
+    void DrawLobbyBackground();
+    void DrawLobbyCenterScene();
     void DrawLobbyTopBar();
     void DrawLobbyLeftMenu();
     void DrawLobbyRightPanels();

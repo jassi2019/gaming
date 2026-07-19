@@ -1,9 +1,12 @@
 // Copyright Island Of Death Games. All Rights Reserved.
 
 #include "UI/SBGameFlowHUD.h"
+#include "UI/IslandOfDeathLoginWidget.h"
 #include "MediaPlayer.h"
 #include "MediaTexture.h"
+#include "MediaSoundComponent.h"
 #include "FileMediaSource.h"
+#include "Blueprint/UserWidget.h"
 #include "Character/SBCharacterBase.h"
 #include "Character/SBCharacterMovementComponent.h"
 #include "Weapon/SBWeaponComponent.h"
@@ -65,11 +68,21 @@ void ASBGameFlowHUD::SetupSplashVideo()
     SplashMediaPlayer->SetLooping(false);
     SplashMediaPlayer->PlayOnOpen = true;
 
+    // Media texture for video
     SplashMediaTexture = NewObject<UMediaTexture>(this);
     if (SplashMediaTexture)
     {
         SplashMediaTexture->SetMediaPlayer(SplashMediaPlayer);
         SplashMediaTexture->UpdateResource();
+    }
+
+    // Media sound component for audio playback
+    SplashMediaSound = NewObject<UMediaSoundComponent>(this);
+    if (SplashMediaSound)
+    {
+        SplashMediaSound->SetMediaPlayer(SplashMediaPlayer);
+        SplashMediaSound->RegisterComponent();
+        UE_LOG(LogStormBreaker, Log, TEXT("MediaSoundComponent created for splash video audio"));
     }
 
     FString VideoPath = FPaths::ProjectContentDir() / TEXT("Splash/SplashVideo.mp4");
@@ -119,7 +132,7 @@ void ASBGameFlowHUD::BeginPlay()
     if (PC)
     {
         PC->SetShowMouseCursor(true);
-        PC->SetInputMode(FInputModeGameAndUI());
+        PC->SetInputMode(FInputModeUIOnly());
         APawn* Pawn = PC->GetPawn();
         if (Pawn)
         {
@@ -128,6 +141,9 @@ void ASBGameFlowHUD::BeginPlay()
             Pawn->DisableInput(PC);
         }
     }
+
+    // Create login widget immediately
+    CreateLoginWidget();
 }
 
 void ASBGameFlowHUD::Tick(float DeltaTime)
@@ -198,13 +214,26 @@ void ASBGameFlowHUD::StartTransition(ESBFlowScreen Target, float Duration)
 
 void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
 {
+    // Cleanup: remove login widget when leaving login screen
+    if (CurrentScreen == ESBFlowScreen::Login && Screen != ESBFlowScreen::Login)
+    {
+        DestroyLoginWidget();
+    }
+
     CurrentScreen = Screen;
     ScreenTimer = 0.0f;
 
     APlayerController* PC = GetOwningPlayerController();
     if (!PC) return;
 
-    if (Screen == ESBFlowScreen::InGame)
+    if (Screen == ESBFlowScreen::Login)
+    {
+        // Show UMG login widget
+        CreateLoginWidget();
+        PC->SetShowMouseCursor(true);
+        PC->SetInputMode(FInputModeUIOnly());
+    }
+    else if (Screen == ESBFlowScreen::InGame)
     {
         PC->SetShowMouseCursor(false);
         PC->SetInputMode(FInputModeGameOnly());
@@ -229,6 +258,57 @@ void ASBGameFlowHUD::GoToScreen(ESBFlowScreen Screen)
     }
 }
 
+// --- Login Widget Management ---
+
+void ASBGameFlowHUD::CreateLoginWidget()
+{
+    if (LoginWidget) return; // already exists
+
+    APlayerController* PC = GetOwningPlayerController();
+    if (!PC) return;
+
+    LoginWidget = CreateWidget<UIslandOfDeathLoginWidget>(PC, UIslandOfDeathLoginWidget::StaticClass());
+    if (LoginWidget)
+    {
+        // Bind all login button delegates to our handler
+        LoginWidget->OnGoogleLoginClicked.AddDynamic(this, &ASBGameFlowHUD::OnLoginButtonPressed);
+        LoginWidget->OnFacebookLoginClicked.AddDynamic(this, &ASBGameFlowHUD::OnLoginButtonPressed);
+        LoginWidget->OnAppleLoginClicked.AddDynamic(this, &ASBGameFlowHUD::OnLoginButtonPressed);
+        LoginWidget->OnGuestLoginClicked.AddDynamic(this, &ASBGameFlowHUD::OnLoginButtonPressed);
+
+        LoginWidget->AddToViewport(10);
+
+        UE_LOG(LogStormBreaker, Log, TEXT("Login widget created and added to viewport"));
+    }
+}
+
+void ASBGameFlowHUD::DestroyLoginWidget()
+{
+    if (LoginWidget)
+    {
+        LoginWidget->RemoveFromParent();
+        LoginWidget = nullptr;
+        UE_LOG(LogStormBreaker, Log, TEXT("Login widget removed"));
+    }
+}
+
+void ASBGameFlowHUD::OnLoginButtonPressed()
+{
+    // Login via backend
+    UGameInstance* GI = GetGameInstance();
+    if (GI)
+    {
+        USBBackendSubsystem* Backend = GI->GetSubsystem<USBBackendSubsystem>();
+        if (Backend)
+        {
+            Backend->Login(ESBAuthProvider::Guest);
+        }
+    }
+
+    // Smooth transition to loading screen
+    StartTransition(ESBFlowScreen::Loading, 0.8f);
+}
+
 void ASBGameFlowHUD::DrawTransitionOverlay()
 {
     if (!bTransitioning) return;
@@ -247,7 +327,10 @@ void ASBGameFlowHUD::DrawHUD()
     switch (CurrentScreen)
     {
     case ESBFlowScreen::Splash:  DrawSplashScreen();  break;
-    case ESBFlowScreen::Login:   DrawLoginScreen();   break;
+    case ESBFlowScreen::Login:
+        // Login screen is now UMG widget-based — only draw black background
+        DrawRect(FLinearColor(0, 0, 0), 0, 0, Canvas->SizeX, Canvas->SizeY);
+        break;
     case ESBFlowScreen::Loading: DrawLoadingScreen(); break;
     case ESBFlowScreen::Lobby:   DrawLobbyScreen();   break;
     case ESBFlowScreen::InGame:  DrawInGameHUD();     break;

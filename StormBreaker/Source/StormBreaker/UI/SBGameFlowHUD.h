@@ -10,6 +10,8 @@
 class UMediaPlayer;
 class UMediaSource;
 class UMediaTexture;
+class UMediaSoundComponent;
+class UIslandOfDeathLoginWidget;
 
 UENUM(BlueprintType)
 enum class ESBFlowScreen : uint8
@@ -57,9 +59,19 @@ public:
     TObjectPtr<UMediaPlayer> SplashMediaPlayer;
     UPROPERTY()
     TObjectPtr<UMediaTexture> SplashMediaTexture;
+    UPROPERTY()
+    TObjectPtr<UMediaSoundComponent> SplashMediaSound;
     void SetupSplashVideo();
     void DrawSplashVideo();
     bool bSplashVideoPlaying;
+
+    // --- Login Widget (UMG-based) ---
+    UPROPERTY()
+    TObjectPtr<UIslandOfDeathLoginWidget> LoginWidget;
+    void CreateLoginWidget();
+    void DestroyLoginWidget();
+    UFUNCTION()
+    void OnLoginButtonPressed();
 
 private:
     // --- Screen Draws ---

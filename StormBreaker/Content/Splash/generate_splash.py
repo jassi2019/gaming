@@ -216,17 +216,17 @@ def generate_splash(width, height, filename_base):
     title_size = max(24, width // 14)
     title_font = get_font(title_size, bold=True)
     title_y = int(height * 0.35)
-    draw_metallic_text(img, draw, "STORMBREAKER", title_font, width // 2, title_y)
+    draw_metallic_text(img, draw, "ISLAND OF DEATH", title_font, width // 2, title_y)
 
     # 7. Tagline
     tag_size = max(12, width // 40)
     tag_font = get_font(tag_size, bold=False)
     tag_y = title_y + title_size // 2 + tag_size
-    tag_bbox = tag_font.getbbox("BATTLE ROYALE")
+    tag_bbox = tag_font.getbbox("They Seek Survival")
     tag_w = tag_bbox[2] - tag_bbox[0]
     draw.text(
         (width // 2 - tag_w // 2, tag_y),
-        "BATTLE ROYALE",
+        "They Seek Survival",
         font=tag_font,
         fill=(160, 175, 200, 200)
     )
@@ -250,7 +250,7 @@ def generate_splash(width, height, filename_base):
     )
 
     # 10. Bottom-left: copyright
-    copy_text = "StormBreaker Games"
+    copy_text = "Island Of Death Games"
     draw.text(
         (15, height - ver_size - 12),
         copy_text,

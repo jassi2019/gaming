@@ -270,7 +270,27 @@ void ASBGameFlowHUD::CreateLoginWidget()
     APlayerController* PC = GetOwningPlayerController();
     if (!PC) return;
 
-    LoginWidget = CreateWidget<UIslandOfDeathLoginWidget>(PC, UIslandOfDeathLoginWidget::StaticClass());
+    // Try to load Blueprint subclass first (has textures set in editor)
+    UClass* LoginWidgetClass = nullptr;
+    static ConstructorHelpers::FClassFinder<UIslandOfDeathLoginWidget>* BPClass = nullptr;
+
+    // Try loading Blueprint widget from Content/UI/
+    UClass* BPWidgetClass = LoadClass<UIslandOfDeathLoginWidget>(nullptr,
+        TEXT("/Game/UI/WBP_LoginScreen.WBP_LoginScreen_C"));
+
+    if (BPWidgetClass)
+    {
+        LoginWidgetClass = BPWidgetClass;
+        UE_LOG(LogStormBreaker, Log, TEXT("Using Blueprint login widget: WBP_LoginScreen"));
+    }
+    else
+    {
+        // Fallback to C++ class (no textures, but functional)
+        LoginWidgetClass = UIslandOfDeathLoginWidget::StaticClass();
+        UE_LOG(LogStormBreaker, Warning, TEXT("WBP_LoginScreen not found, using C++ fallback. Create Blueprint: Content/UI/WBP_LoginScreen"));
+    }
+
+    LoginWidget = CreateWidget<UIslandOfDeathLoginWidget>(PC, LoginWidgetClass);
     if (LoginWidget)
     {
         // Bind all login button delegates to our handler

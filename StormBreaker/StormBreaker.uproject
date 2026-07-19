@@ -1,44 +1,94 @@
 {
-    "FileVersion": 3,
-    "EngineAssociation": "5.8",
-    "Category": "",
-    "Description": "StormBreaker - Battle Royale Game",
-    "Modules": [
-        {
-            "Name": "StormBreaker",
-            "Type": "Runtime",
-            "LoadingPhase": "Default",
-            "AdditionalDependencies": [
-                "Engine",
-                "CoreUObject",
-                "UMG",
-                "AIModule",
-                "GameplayAbilities",
-                "EnhancedInput",
-                "OnlineSubsystem",
-                "OnlineSubsystemEOS",
-                "Niagara"
-            ]
-        },
-        {
-            "Name": "StormBreakerServer",
-            "Type": "ServerOnly",
-            "LoadingPhase": "Default"
-        }
-    ],
-    "Plugins": [
-        { "Name": "EnhancedInput", "Enabled": true },
-        { "Name": "GameplayAbilities", "Enabled": true },
-        { "Name": "OnlineSubsystemEOS", "Enabled": true },
-        { "Name": "OnlineSubsystem", "Enabled": true },
-        { "Name": "Niagara", "Enabled": true },
-        { "Name": "Water", "Enabled": true },
-        { "Name": "ChaosVehiclesPlugin", "Enabled": true },
-        { "Name": "AudioModulation", "Enabled": true },
-        { "Name": "Metasound", "Enabled": true }
-    ],
-    "TargetPlatforms": [
-        "Android",
-        "Windows"
-    ]
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "",
+	"Description": "StormBreaker - Battle Royale Game",
+	"Modules": [
+		{
+			"Name": "StormBreaker",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"CoreUObject",
+				"UMG",
+				"AIModule",
+				"GameplayAbilities",
+				"EnhancedInput",
+				"OnlineSubsystem",
+				"OnlineSubsystemEOS",
+				"Niagara"
+			]
+		},
+		{
+			"Name": "StormBreakerServer",
+			"Type": "ServerOnly",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemEOS",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystem",
+			"Enabled": true
+		},
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
+		},
+		{
+			"Name": "ChaosVehiclesPlugin",
+			"Enabled": true
+		},
+		{
+			"Name": "AudioModulation",
+			"Enabled": true
+		},
+		{
+			"Name": "Metasound",
+			"Enabled": true
+		},
+		{
+			"Name": "MediaFrameworkUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "WMFCodecs",
+			"Enabled": true,
+			"SupportedTargetPlatforms": [
+				"Win64"
+			]
+		},
+		{
+			"Name": "WmfMedia",
+			"Enabled": true
+		},
+		{
+			"Name": "MediaPlayerEditor",
+			"Enabled": true
+		},
+		{
+			"Name": "MediaCompositing",
+			"Enabled": true
+		}
+	],
+	"TargetPlatforms": [
+		"Android",
+		"Windows"
+	]
 }
